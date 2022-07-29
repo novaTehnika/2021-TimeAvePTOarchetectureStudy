@@ -63,6 +63,7 @@
 % zero2nan.m
 % parameters_timeAvePTO.m
 % loadColors.m
+% data_timeAveWEC_slim_20220727.mat
 %
 % UPDATES
 % 12/31/2021 - created.
@@ -88,7 +89,7 @@ clc
 
 %% %%%%%%%%%%%%   SIMULATION/DESIGN PARAMETERS  %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Initialize parameter structure and get misc. base parameters 
+% Initialize parameter structure and get misc. base parameters
 par = parameters_timeAvePTO();
 
 % bounds on pressures in system
@@ -97,10 +98,10 @@ bounds.p_w_bnds = [4e6 30e6]; % [Pa/Pa] Bounds for pressure at WEC driven pump
 bounds.D_bnds = [0.1 1]; % [-] bounds for valve switching duty
 
 % WEC: load time averaged results for WEC performance
-load('data_timeAveWEC_slim_XXXXX.mat')
+load('data_timeAveWEC_slim_20220727.mat')
 par.T_c_data = T_c_data; % [Nm] Torque applied to WEC by PTO
 par.PP_w_data = PP_w_data; % [W] Power transmitted by WEC to PTO
-par.weight = weight; 
+par.weight = weight;
 par.Hs = Hs;
 par.Tp = Tp;
 clearvars T_c_data PP_w_data weight Hs Tp
