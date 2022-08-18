@@ -109,12 +109,12 @@ clearvars T_c_data PP_w_data weight Hs Tp
 %% %%%%%%%%%%%%   Study Variables  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % WEC-driven pump displacment
-nD_w = 101; % Size of array for displacment
+nD_w = 11; % Size of array for displacment
 % D_w = linspace(0.05,2,nD_w);
 D_wArray = logspace(log10(0.01),log10(.75),nD_w); % [m^3/s] displacement
 
 % membrane area in Ro module
-S_roArray = [1500 3000 4500];% [m^2] membrane area
+S_roArray = [1500 3000 4500 6000 9000 ];% [m^2] membrane area
 nS_ro = length(S_roArray); % Size of array for permeate coefficient
 
 % Specify PTO configurations
@@ -123,7 +123,7 @@ design_case = [1 2 1 2];
 nPTO = length(iiPTO);
 
 % Specify the set of sea-states to design for
-SSset = [ 1 2 3 4 5 6];
+SSset = [1:114];
 par.SSset = SSset;
 
 %% %%%%%%%%%%%%   COLLECT DATA  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -155,7 +155,7 @@ return
 
 
 %% Plot results for each architecture on same plot
-lines = [{'-'},{'-.'},{'--'},{':'}];
+lines = [{'-'},{'-.'},{'--'},{':'},{':'}];
 marker = [{'x'},{'s'},{'^'},{'*'}];
 loadColors;
 C = [black; maroon; blue; green];
@@ -192,7 +192,7 @@ title('Design Performance')
 
 
 
-%% Plotting Cost
+%% Plotting Results
 % Cost normalized by the cost per RO size
 cost = @(D_w,S_ro,q_perm,lam_1,lam_2) ...
     (D_w + lam_1*S_ro + lam_2)./zero2nan(q_perm);

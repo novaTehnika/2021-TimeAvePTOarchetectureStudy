@@ -93,8 +93,8 @@ function data = PTOsizing_multiSS(D_wArray,S_roArray,bounds,iPTO,design_case,par
     % options = optimset('Display','iter','PlotFcns',@optimplotfval);
     options = optimoptions('fmincon');
     options.Display = 'off';
-    options.MaxFunEvals = 1e8;
-    options.MaxIter = 1e8;
+    options.MaxFunEvals = 1e4;
+    options.MaxIter = 1e2;
 %     options.TolFun = 1e-17;
 %     options.TolCon = 1e-17;
     options.OptimalityTolerance = 1e-20;
@@ -227,6 +227,8 @@ function data = PTOsizing_multiSS(D_wArray,S_roArray,bounds,iPTO,design_case,par
             end
         end
     end
+    
+    clearvars temp
     
     %% Post-Process
     % combine designs across sea states based on the four possible ways in
