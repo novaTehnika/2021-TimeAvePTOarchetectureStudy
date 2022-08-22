@@ -136,32 +136,17 @@ for iPTO = iiPTO
                  bounds,PTOarray(iPTO),design_case(iPTO),par);
     toc
 
-    %%% Intermediate Save
-    filename = ['data_intermediateSave_',date];
-    files = ls;
-    nfiles = size(files,1);
-    k = 1;
-    for j = 1:nfiles
-        if strfind(files(j,:),filename)
-            k = k+1;
-        end
-    end
-    save([filename,'_',num2str(k)])
+    %%% Intermediate Save: time in ISO8601
+    filename = ['data_intermediateSave_PTO',num2str(iPTO),...
+                    '-',datestr(now,'yyyymmddTHHMMSS')];
+    save(filename)
     %%%
 
 end
 
 %% %%%%%%%%%%%%   SAVE DATA   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-filename = ['data_PTOsizing_contour_',date];
-files = ls;
-nfiles = size(files,1);
-k = 1;
-for j = 1:nfiles
-    if strfind(files(j,:),filename)
-        k = k+1;
-    end
-end
-save([filename,'_',num2str(k)])
+filename = ['data_PTOsizing_contour_',datestr(now,'yyyymmddTHHMMSS')];
+save(filename)
 
 return
 
