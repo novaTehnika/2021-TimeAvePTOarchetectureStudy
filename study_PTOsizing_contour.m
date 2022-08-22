@@ -84,7 +84,7 @@
 %   along with this program. If not, see <https://www.gnu.org/licenses/>.
 %
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clear
+clearvars -except iiPTO
 clc
 
 %% %%%%%%%%%%%%   SIMULATION/DESIGN PARAMETERS  %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -119,21 +119,21 @@ nS_ro = 101; % Size of array for membrane area
 S_roArray = logspace(log10(1e3),log10(2e5),nS_ro);% [m^2] membrane area
 
 % Specify PTO configurations
-iiPTO = [1 1 3 3 4 1 1 3 3 4];
+PTOarray = [1 1 3 3 4 1 1 3 3 4];
 design_case = [1 2 1 2 2 3 4 3 4 4];
-nPTO = length(iiPTO);
+nPTO = length(PTOarray);
 
 % Specify the set of sea-states to design for
 SSset = [1:114];
 par.SSset = SSset;
 
 %% %%%%%%%%%%%%   COLLECT DATA  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-for iPTO = 1:nPTO
+if ~exist('iiPTO','var'); iiPTO = 1:nPTO; end
+for iPTO = iiPTO
     display(['Working on PTO ',num2str(iPTO),' of ',num2str(nPTO)])
     tic
     data(iPTO) = PTOsizing_multiSS(D_wArray,S_roArray, ...
-                 bounds,iiPTO(iPTO),design_case(iPTO),par);
+                 bounds,PTOarray(iPTO),design_case(iPTO),par);
     toc
 
     %%% Intermediate Save

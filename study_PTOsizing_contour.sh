@@ -2,16 +2,20 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=64
 #SBATCH --mem=128g
-#SBATCH -t 48:00:00
+#SBATCH -t 72:00:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=simmo536@umn.edu
 #SBATCH -p amdsmall
-#SBATCH -o %j.out
-#SBATCH -e %j.err
+#SBATCH -o %A.out
+#SBATCH -e %A.err
 
 cd ~/2021Q3-PTO-archetecture-sizing
 module load matlab
-matlab -nodisplay -r "study_PTOsizing_contour"
+matlab -nodisplay -r \
+"parpool('local',$SLURM_JOB_CPUS_PER_NODE); \
+iiPTO = $PTOlb:$PTOub; \
+study_PTOsizing_contour"
 
-# sbatch study_PTOsizing_contour.sh
+# sbatch --export=PTOlb=1,PTOub=3 study_PTOsizing_contour.sh
 # dos2unix  study_PTOsizing_contour.sh
+
