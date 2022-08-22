@@ -67,6 +67,8 @@ function data = PTOsizing_multiSS(D_wArray,S_roArray,bounds,iPTO,design_case,par
 % 
 % UPDATES:
 % 12/31/2021 - created.
+% 08/22/2022 - Corrected constraint on WEC-driven torque to be included in 
+% constraint function in the optimization.
 %
 % Copyright (C) 2022  Jeremy W. Simmons II
 % 
@@ -157,7 +159,7 @@ function data = PTOsizing_multiSS(D_wArray,S_roArray,bounds,iPTO,design_case,par
     S_ro = zeros(nD_w, nS_ro); % [m^3/Pa.s] Permeate coefficient
     T_c = zeros(nD_w, nS_ro, nSS); % [Nm] Torque applied to WEC by PTO
     PP_w = zeros(nD_w, nS_ro, nSS); % [W] Power transmitted to PTO by WEC
-    c = zeros(nD_w, nS_ro, nSS,3); % Constraint variables (c < 0)               % why the 3?
+    c = zeros(nD_w, nS_ro, nSS,4); % Constraint variables (c < 0)
     feasible = zeros(nD_w,nS_ro,nSS);
     p_i = zeros(nD_w, nS_ro, nSS); % [Pa] Operating pressure
     duty = zeros(nD_w, nS_ro, nSS); % [-] switching valve duty
@@ -212,7 +214,7 @@ function data = PTOsizing_multiSS(D_wArray,S_roArray,bounds,iPTO,design_case,par
                 feasible(iD_w,iS_ro,iSS) = temp(1) <= 0 ...
                                   &  temp(2) <= 0 ...
                                   &  temp(3) <= 0 ...
-                                  & T_c(iD_w,iS_ro,iSS) < max(param.T_c_data(iSS,:));
+                                  &  temp(4) <= 0;
     
                 % Calculate and record performance variables
                 [q_perm(iD_w,iS_ro,iSS),...

@@ -1,6 +1,6 @@
 function  varargout = model_timeAvePTO(x,par,iPTO,outputConfig)
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% model_timeAvePTO_VXX.m function m-file
+% model_timeAvePTO.m function m-file
 % AUTHORS:
 % Jeremy Simmons (email: simmo536@umn.edu)
 % University of Minnesota
@@ -21,6 +21,8 @@ function  varargout = model_timeAvePTO(x,par,iPTO,outputConfig)
 %
 % UPDATES:
 % 12/31/2021 - created.
+% 08/22/2022 - Added constraint on WEC-driven torque to be less than
+% max for supplied torque-power data.
 %
 % Copyright (C) 2022  Jeremy W. Simmons II
 % 
@@ -86,6 +88,7 @@ function  varargout = model_timeAvePTO(x,par,iPTO,outputConfig)
             c(1) = PP_c - PP_gen;
             c(2) = p_f - par.p_f_bnds(2);
             c(3) = par.p_f_bnds(1) - p_f;
+            c(4) = T_c - par.T_c_data(par.SS,end);
             ceq = [];
             varargout = {c,ceq};
         case 3

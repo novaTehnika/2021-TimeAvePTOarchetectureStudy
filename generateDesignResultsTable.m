@@ -36,6 +36,9 @@
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% find design values for a given combination specified by max disp. and RO module size
+switch 2
+%% 1: for studies that index data variable with PTO type and membrane area
+    case 1
 iPTO = 3;
 iiS_ro = 1;
 D_wChoice = 0.10;
@@ -73,6 +76,50 @@ if iiPTO(iPTO) == 2 || iiPTO(iPTO) == 4
     end
 end
 
+%% 1: for studies that index data variable with PTO type
+    case 2
+iPTO = 3;
+iiS_ro = 1;
+D_wChoice = 2;
+S_roChoice = 2e5;
+iD_wChoice = find(data(iPTO).D_w(:,1) <= D_wChoice, 1,'last');
+iS_roChoice = find(data(iPTO).S_ro(1,:) <= S_roChoice, 1,'last');
+
+nSS = length(data(iPTO).par.SSset);
+D_wDesign = zeros(1,nSS);
+S_roDesign = zeros(1,nSS);
+P_iDesign = zeros(1,nSS);
+for iSS = 1:nSS
+    iD_w = data(iPTO).design(iD_wChoice,iS_roChoice,iSS).iD_w;
+    iS_ro = data(iPTO).design(iD_wChoice,iS_roChoice,iSS).iS_ro;
+    q_perm(iSS) = data(iPTO).design(iD_wChoice,iS_roChoice,iSS).q_perm;
+    D_wDesign(iSS) = data(iPTO).D_w(iD_w,1);
+    S_roDesign(iSS) = data(iPTO).S_ro(1,iS_ro);
+    P_iDesign(iSS) = data(iPTO).p_i(iD_w,iS_ro,iSS);
+    feasible(iSS) = data(iPTO).feasible(iD_w,iS_ro,iSS);
+    if ~feasible(iSS)
+        D_wDesign(iSS) = nan;
+        S_roDesign(iSS) = nan;
+        P_iDesign(iSS) = nan;
+    end
+end
+
+if iiPTO(iPTO) == 2 || iiPTO(iPTO) == 4
+    dutyDesign = zeros(1,nSS);
+    for iSS = 1:nSS
+        iD_w = data(iPTO).design(iD_wChoice,iS_roChoice,iSS).iD_w;
+        iS_ro = data(iPTO).design(iD_wChoice,iS_roChoice,iSS).iS_ro;
+        dutyDesign(iSS) = data(iPTO).duty(iD_w,iS_ro,iSS);
+        if ~feasible(iSS)
+            dutyDesign(iSS) = nan;
+        end
+    end
+end
+
+end
+
+%% make table
+
 switch iiPTO(iPTO)
     case {1 3}
         varNames = {'Sea State','Displacement (L/rad)', ...
@@ -85,3 +132,5 @@ switch iiPTO(iPTO)
         T_D = table([data(iPTO,iiS_ro).par.SSset]',1e3*D_wDesign',S_roDesign',24*3600*q_perm',1e-6*P_iDesign', ...
                     dutyDesign',feasible','VariableNames',varNames)
 end
+
+%% find design values for a given combination specified by max disp. and RO module size
