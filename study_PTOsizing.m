@@ -63,7 +63,7 @@
 % zero2nan.m
 % parameters_timeAvePTO.m
 % loadColors.m
-% data_timeAveWEC_slim_20220727.mat
+% data_coulombPTO_dampingStudy_24-Aug-2022_1_slim.mat
 %
 % UPDATES
 % 12/31/2021 - created.
@@ -98,7 +98,8 @@ bounds.p_w_bnds = [4e6 30e6]; % [Pa/Pa] Bounds for pressure at WEC driven pump
 bounds.D_bnds = [0.1 1]; % [-] bounds for valve switching duty
 
 % WEC: load time averaged results for WEC performance
-load('data_timeAveWEC_slim_20220727.mat')
+filename_WECpowerCurve = 'data_coulombPTO_dampingStudy_24-Aug-2022_1_slim.mat';
+load(filename_WECpowerCurve)
 par.T_c_data = T_c_data; % [Nm] Torque applied to WEC by PTO
 par.PP_w_data = PP_w_data; % [W] Power transmitted by WEC to PTO
 par.weight = weight;

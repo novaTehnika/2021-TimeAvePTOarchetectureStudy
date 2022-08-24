@@ -63,7 +63,7 @@
 % zero2nan.m
 % parameters_timeAvePTO.m
 % loadColors.m
-% data_timeAveWEC_slim_20220727.mat
+% data_coulombPTO_dampingStudy_24-Aug-2022_1_slim.mat
 %
 % UPDATES
 % 12/31/2021 - created.
@@ -98,7 +98,7 @@ bounds.p_w_bnds = [4e6 30e6]; % [Pa/Pa] Bounds for pressure at WEC driven pump
 bounds.D_bnds = [0.1 1]; % [-] bounds for valve switching duty
 
 % WEC: load time averaged results for WEC performance
-filename_WECpowerCurve = 'data_coulombPTO_dampingStudy_03-Aug-2022_1_slim.mat';
+filename_WECpowerCurve = 'data_coulombPTO_dampingStudy_24-Aug-2022_1_slim.mat';
 load(filename_WECpowerCurve)
 par.T_c_data = T_c_data; % [Nm] Torque applied to WEC by PTO
 par.PP_w_data = PP_w_data; % [W] Power transmitted by WEC to PTO
@@ -162,44 +162,35 @@ ylabel('Displacement (m^3/rad)')
 zlabel('Permeate Production (L/s)')
 title('Design Performance: PTO 1')
 
+%%
+lineWidth = 1.5;
+iPTO1 = 4;
 
-% %% Plot results for each architecture on same plot
-% lines = [{'-'},{'-.'},{'--'},{':'},{':'}];
-% marker = [{'x'},{'s'},{'^'},{'*'}];
-% loadColors;
-% C = [black; maroon; blue; green];
-% figure
-% hold on
-% for iPTO = 1:nPTO
-%     for iS_ro = 1:nS_ro
-%         p(iPTO,iS_ro) = plot(1e3*data(iPTO,iS_ro).D_w(:),...
-%             1e3*data(iPTO,iS_ro).q_permTotal(:),...
-%             'Color', C(iPTO,:),'lineStyle',cell2mat(lines(iS_ro)),'lineWidth',1.5);
-%         p(iPTO,iS_ro).Annotation.LegendInformation.IconDisplayStyle = 'off';
-%     end
-% end
-% 
-% xLim = xlim;
-% yLim = ylim;
-% for iPTO = 1:nPTO
-%     scatter(-999,-999,50,C(iPTO,:),'filled','s')
-% end
-% for iS_ro = 1:nS_ro
-%     plot([-999 -998],[-999 -999],...
-%         'k','lineStyle',cell2mat(lines(iS_ro)),'lineWidth',1.5);
-% end
-% xlim(xLim)
-% ylim(yLim)
-% 
-% legend('PTO 1','PTO 2','PTO 3','PTO 4',...
-%     ['S_{ro}=',num2str(S_roArray(1)),'m^2'],...
-%     ['S_{ro}=',num2str(S_roArray(2)),'m^2'],...
-%     ['S_{ro}=',num2str(S_roArray(3)),'m^2'])
-% xlabel('Displacement (L/rad)')
-% ylabel('Permeate Production (L/s)')
-% title('Design Performance')
+loadColors
+levels = [5 10 15 20 25 30 35 40];
+color1 = maroon;
+color2 = gold; 
+nlines = length(levels);
+colorWeight = linspace(0,1,nlines);
+co = zeros(nlines,3);
+for i=1:nlines
+    co(i,:) = colorWeight(i)*color2 + colorWeight(nlines-(i-1))*color1; 
+end
 
+f = figure;
+colormap(f,co)
 
+[M,c1] = contourf(data(iPTO1).S_ro,data(iPTO1).D_w,data(iPTO1).q_permTotal,levels,'-','ShowText','on')
+c1.LineWidth = lineWidth;
+hold on
+iPTO2 = 9;
+[M,c2] = contour(data(iPTO2).S_ro,data(iPTO2).D_w,data(iPTO2).q_permTotal,levels,'--','ShowText','on')
+c2.LineWidth = lineWidth;
+xlabel('Membrane Area (m^2)')
+ylabel('Displacement (m^3/rad)')
+% zlabel('Permeate Production (L/s)')
+title(['Design Performance: PTO ',num2str(iPTO1)])
+legend(['PTO ',num2str(iPTO1)],['PTO ',num2str(iPTO2)])
 
 %% Plotting Results
 % Cost normalized by the cost per RO size
