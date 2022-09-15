@@ -98,7 +98,7 @@ bounds.p_w_bnds = [4e6 30e6]; % [Pa/Pa] Bounds for pressure at WEC driven pump
 bounds.D_bnds = [0.1 1]; % [-] bounds for valve switching duty
 
 % WEC: load time averaged results for WEC performance
-filename_WECpowerCurve = 'data_coulombPTO_dampingStudy_24-Aug-2022_1_slim.mat';
+filename_WECpowerCurve = 'data_coulombPTO_dampingStudy_31-Aug-2022_2_slim.mat';
 load(filename_WECpowerCurve)
 par.T_c_data = T_c_data; % [Nm] Torque applied to WEC by PTO
 par.PP_w_data = PP_w_data; % [W] Power transmitted by WEC to PTO
@@ -110,13 +110,14 @@ clearvars T_c_data PP_w_data weight Hs Tp
 %% %%%%%%%%%%%%   Study Variables  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % WEC-driven pump displacment
-nD_w = 101; % Size of array for displacment
+nD_w = 201; % Size of array for displacment
 % D_w = linspace(0.05,2,nD_w);
-D_wArray = logspace(log10(0.1),log10(4),nD_w); % [m^3/s] displacement
+D_wArray = logspace(log10(0.01),log10(1),nD_w); % [m^3/s] displacement
 
 % membrane area in Ro module
-nS_ro = 101; % Size of array for membrane area
-S_roArray = logspace(log10(1e3),log10(2e5),nS_ro);% [m^2] membrane area
+nS_ro = 201; % Size of array for membrane area
+S_roArray = logspace(log10(1e3),log10(0.3e5),nS_ro);% [m^2] membrane area
+
 
 % Specify PTO configurations
 PTOarray = [1 1 3 3 4 1 1 3 3 4];
@@ -127,8 +128,10 @@ nPTO = length(PTOarray);
 SSset = [1:114];
 par.SSset = SSset;
 
+% check for specified PTO architectures
+if ~exist('iiPTO','var'); iiPTO = 1:nPTO; end 
+
 %% %%%%%%%%%%%%   COLLECT DATA  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if ~exist('iiPTO','var'); iiPTO = 1:nPTO; end
 for iPTO = iiPTO
     display(['Working on PTO ',num2str(iPTO),' of ',num2str(nPTO)])
     tic
@@ -155,19 +158,19 @@ return
 %% Plotting multiple sea state designs, Complete design space
 iPTO = 1;
 figure
-scatter3(data(iPTO).S_ro(:),data(iPTO).D_w(:),data(iPTO).q_permTotal(:),5,'filled')
+scatter3(data(iPTO).S_ro(:),data(iPTO).D_w(:),24*3600*data(iPTO).q_permTotal(:),5,'filled')
 % zlim([0,max(max(q_permTotal_A))])
 xlabel('Membrane Area (m^2)')
 ylabel('Displacement (m^3/rad)')
 zlabel('Permeate Production (L/s)')
 title('Design Performance: PTO 1')
 
-%%
+%% Compare two PTOs
 lineWidth = 1.5;
-iPTO1 = 4;
+iPTO1 = 1;
 
 loadColors
-levels = [5 10 15 20 25 30 35 40];
+levels = [.5 1 1.5 2 2.5 3 3.3 3.5];
 color1 = maroon;
 color2 = gold; 
 nlines = length(levels);
@@ -180,12 +183,12 @@ end
 f = figure;
 colormap(f,co)
 
-[M,c1] = contourf(data(iPTO1).S_ro,data(iPTO1).D_w,data(iPTO1).q_permTotal,levels,'-','ShowText','on')
+[M,c1] = contour(data(iPTO1).S_ro,data(iPTO1).D_w,data(iPTO1).q_permTotal,levels,'-','ShowText','on')
 c1.LineWidth = lineWidth;
 hold on
-iPTO2 = 9;
-[M,c2] = contour(data(iPTO2).S_ro,data(iPTO2).D_w,data(iPTO2).q_permTotal,levels,'--','ShowText','on')
-c2.LineWidth = lineWidth;
+% iPTO2 = 2;
+% [M,c2] = contour(data(iPTO2).S_ro,data(iPTO2).D_w,data(iPTO2).q_permTotal,levels,'--','ShowText','off')
+% c2.LineWidth = lineWidth;
 xlabel('Membrane Area (m^2)')
 ylabel('Displacement (m^3/rad)')
 % zlabel('Permeate Production (L/s)')

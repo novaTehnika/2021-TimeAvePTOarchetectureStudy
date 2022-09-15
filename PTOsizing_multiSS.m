@@ -222,9 +222,10 @@ function data = PTOsizing_multiSS(D_wArray,S_roArray,bounds,iPTO,design_case,par
                  PP_w(iD_w,iS_ro,iSS)] = model_timeAvePTO(x.*x_scale,param,iPTO,3);
     
                 % modify permeate production rate with weight for sea state and
-                % feasibility of result
+                % feasibility of result. Weight is given as percentage.
                 q_perm(iD_w,iS_ro,iSS) = feasible(iD_w,iS_ro,iSS)...
-                                         *par.weight(iSS)*q_perm(iD_w,iS_ro,iSS);
+                                            *par.weight(iSS)/100 ...
+                                            *q_perm(iD_w,iS_ro,iSS);
     
             end
         end
