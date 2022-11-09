@@ -98,7 +98,7 @@ bounds.p_w_bnds = [4e6 30e6]; % [Pa/Pa] Bounds for pressure at WEC driven pump
 bounds.D_bnds = [0.1 1]; % [-] bounds for valve switching duty
 
 % WEC: load time averaged results for WEC performance
-filename_WECpowerCurve = 'data_coulombPTO_dampingStudy_31-Aug-2022_2_slim.mat';
+filename_WECpowerCurve = 'data_coulombPTO_dampingStudy_20220927_slim.mat';
 load(filename_WECpowerCurve)
 par.T_c_data = T_c_data; % [Nm] Torque applied to WEC by PTO
 par.PP_w_data = PP_w_data; % [W] Power transmitted by WEC to PTO
@@ -112,7 +112,7 @@ clearvars T_c_data PP_w_data weight Hs Tp
 % WEC-driven pump displacment
 nD_w = 201; % Size of array for displacment
 % D_w = linspace(0.05,2,nD_w);
-D_wArray = logspace(log10(0.01),log10(1),nD_w); % [m^3/s] displacement
+D_wArray = logspace(log10(0.01),log10(1.25),nD_w); % [m^3/s] displacement
 
 % membrane area in Ro module
 nS_ro = 201; % Size of array for membrane area
@@ -121,7 +121,7 @@ S_roArray = logspace(log10(1e3),log10(0.3e5),nS_ro);% [m^2] membrane area
 
 % Specify PTO configurations
 PTOarray = [1 1 3 3 4 1 1 3 3 4];
-design_case = [1 2 1 2 2 3 4 3 4 4];
+design_case = [1 2 1 2 1 3 4 3 4 3];
 nPTO = length(PTOarray);
 
 % Specify the set of sea-states to design for

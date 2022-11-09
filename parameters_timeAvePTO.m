@@ -42,7 +42,7 @@ function par = parameters_timeAvePTO()
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
      % RO module
-    par.p_osm = 2.7e6; % [Pa] osmotic pressure of feed water
+    par.p_osm =  2.275e6; % [Pa] osmotic pressure of feed water
     par.A_w = 2.57e-12; % [m^3/(N-s)] permeabiity coefficient (Yu and Jenne,2018)
     
      % Charge pump

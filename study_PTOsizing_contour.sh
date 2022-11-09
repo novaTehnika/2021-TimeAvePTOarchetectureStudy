@@ -16,6 +16,15 @@ matlab -nodisplay -r \
 iiPTO = $PTOlb:$PTOub; \
 study_PTOsizing_contour"
 
-# sbatch --export=PTOlb=1,PTOub=3 study_PTOsizing_contour.sh
+# sbatch --export=PTOlb=1,PTOub=1 study_PTOsizing_contour.sh
+# sbatch --export=PTOlb=2,PTOub=2 study_PTOsizing_contour.sh
+# sbatch --export=PTOlb=3,PTOub=3 study_PTOsizing_contour.sh
+# sbatch --export=PTOlb=4,PTOub=4 study_PTOsizing_contour.sh
+# sbatch --export=PTOlb=5,PTOub=5 study_PTOsizing_contour.sh
+# sbatch --export=PTOlb=6,PTOub=6 study_PTOsizing_contour.sh
+# sbatch --export=PTOlb=7,PTOub=7 study_PTOsizing_contour.sh
+# sbatch --export=PTOlb=8,PTOub=8 study_PTOsizing_contour.sh
+# sbatch --export=PTOlb=9,PTOub=9 study_PTOsizing_contour.sh
+# sbatch --export=PTOlb=10,PTOub=10 study_PTOsizing_contour.sh
 # dos2unix  study_PTOsizing_contour.sh
 
