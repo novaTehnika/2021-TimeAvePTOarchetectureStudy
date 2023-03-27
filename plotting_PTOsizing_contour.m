@@ -66,6 +66,9 @@ gold = [255 204 51]/256;
 blue = [0 75 135]/256;
 orange = [226 100 55]/256;
 green = [63 150 87]/256;
+pink = [255 101 134]/256;
+pink = [255 121 150]/256;
+lightMaroon = ([1 1 1] - 0.5*([1 1 1]-maroon));
 
 bottomEdge = 1;
 leftEdge = 3;
@@ -78,8 +81,9 @@ D_w_YuJenne2017 = 0.5466; % [m^3/rad]
 S_ro_YuJenne2017 = (2162)/1e3; % [1000m^2]
 q_permTotal_YuJenne2017 = 1780; % [m^3/day]
 q_permTotal_YuJenne2017_wPRV = 1480; % [m^3/day]
+refColor = 'r';
 
-iPTO = 10;
+iPTO = iiPTO;
 labelPTO = ["P-FF","P-VF","S-FF","S-VF","M-FF", ...
             "P-FV","P-VV","S-FV","S-VV","M-FV"];
 
@@ -99,15 +103,27 @@ ax1.FontName = 'times';
 ax1.FontSize = fontSize-1;
 hold on
 
-[C,c1] = contour(X,Y,Z,levels,'-','ShowText','on')
+% PTO design data
+[C,c1] = contour(X,Y,Z,levels,'-','ShowText','on');
 c1.LineWidth = lineWidth;
 c1.LineColor = 'k';
+c1.HandleVisibility='off';
 
-[~,c2] = contour(X,Y,Z,[0 q_permTotal_YuJenne2017_wPRV],'-r','ShowText','off')
-c2.LineWidth = lineWidth;
-c2.LineColor = 'r';
+% reference contour for Yu and Jenne performance
+[~,c2] = contour(X,Y,Z,[0 q_permTotal_YuJenne2017_wPRV],'--','ShowText','off');
+c2.LineWidth = lineWidth*2;
+c2.LineColor = refColor;
+c2.HandleVisibility='off';
 
-s1 = scatter(S_ro_YuJenne2017,D_w_YuJenne2017,50,'r','x','LineWidth',lineWidth)
+% dummy plots for legend
+p1 = plot(-99*[1, 0.5],-99*[1, 0.5],'-');
+p1.LineWidth = c1.LineWidth;
+p1.Color = c1.LineColor;
+p2 = plot(-99*[1 1],-99*[1 1],'--');
+p2.LineWidth = c2.LineWidth;
+p2.Color = c2.LineColor;
+
+s1 = scatter(S_ro_YuJenne2017,D_w_YuJenne2017,50,refColor,'x','LineWidth',lineWidth);
 
 xlim([0 30])
 ylim([0 1])
@@ -123,11 +139,11 @@ if iPTO == 5 || iPTO == 10
     switch 2
         case 1
             title("Permeate Production (m^3/day): "+labelPTO(iPTO)+...
-                " with 30 MPa limit",...
+                " with 30 MPa Limit",...
                 'FontSize',fontSize,'fontname','Times')
         case 2
             title("Permeate Production (m^3/day): "+labelPTO(iPTO)+...
-                " with 20 MPa limit",...
+                " with 20 MPa Limit",...
                 'FontSize',fontSize,'fontname','Times')
     end
 end
@@ -139,6 +155,7 @@ legLabels = [labelPTO(iPTO),...
 labelPTO(iPTO)+" at " + num2str(q_permTotal_YuJenne2017_wPRV) + " m^3/day", ...
 "reference design"];
 leg = legend(legLabels);
+leg.Location = 'best';
 leg.FontSize = fontSize-1;
 leg.FontName = 'Times';
 
