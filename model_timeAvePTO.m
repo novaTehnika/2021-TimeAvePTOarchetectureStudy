@@ -74,7 +74,8 @@ function  varargout = model_timeAvePTO(x,par,iPTO,outputConfig)
             q_perm = q_w/duty;
             p_f = q_perm/(par.S_ro*par.A_w) + par.p_osm;
             PP_gen = par.eta_gen*q_perm ...
-                     * (D*eta_pm*(p_h-p_f) - (1-D)*(p_f-p_c)/eta_sm);
+                    *(duty*par.eta_pm*(p_h-p_f) ...
+                    - (1-duty)*(p_f-par.p_c)/par.eta_pm);
             
     end
     
