@@ -44,14 +44,15 @@ function par = parameters_timeAvePTO()
      % RO module
     par.p_osm =  2.275e6; % [Pa] osmotic pressure of feed water
     par.A_w = 2.57e-12; % [m^3/(N-s)] permeabiity coefficient (Yu and Jenne,2018)
-    
+    par.Y = 0.25;
+
      % Charge pump
-    par.p_c = 1e6; % [Pa] charge pressure
+    par.p_c = 0.3e6; % [Pa] charge pressure
     par.eta_c = 0.7; % [-] charge pump efficiency
     par.eta_m = 0.9; % [-] elec. motor efficiency
 
      % Pump/motor
-    par.eta_pm = 0.8; % [-] pump/motor efficiency
+    par.eta_pm = 0.9; % [-] pump/motor efficiency
     par.eta_gen = 0.9; % [-] elec. generator efficiency
 
      % WEC-driven pump

@@ -62,7 +62,7 @@ function  varargout = model_timeAvePTO(x,par,iPTO,outputConfig)
             q_w = PP_w*par.eta_w/dp_w;
             PP_gen = (q_w - q_perm) ...
                 *(p_f-par.p_c)*par.eta_pm*par.eta_gen;
-            PP_c = q_perm*par.p_c/(par.eta_c*par.eta_m);
+            
             
         case {3 4}
             p_h = x(1);
@@ -73,12 +73,13 @@ function  varargout = model_timeAvePTO(x,par,iPTO,outputConfig)
             q_w = PP_w*par.eta_w/dp_w;
             q_perm = q_w/duty;
             p_f = q_perm/(par.S_ro*par.A_w) + par.p_osm;
-            PP_gen = q_perm*(((1-duty)*par.p_c + duty*p_h) - p_f)...
-                *par.eta_pm*par.eta_gen;
-            PP_c = q_perm*par.p_c/(par.eta_c*par.eta_m);
+            PP_gen = par.eta_gen*q_perm ...
+                     * (D*eta_pm*(p_h-p_f) - (1-D)*(p_f-p_c)/eta_sm);
             
     end
     
+    PP_c = (q_perm/par.Y)*par.p_c/(par.eta_c*par.eta_m);
+
     switch outputConfig
         case 1
             varargout = {q_perm};
