@@ -67,6 +67,8 @@
 %
 % UPDATES
 % 12/31/2021 - created.
+% 06/15/2023 - add optional ERU (ERUconfig=0 -> w/o ERU; ERUconfig=1 ->
+% w/ ERU). Values between 0 and 1 effectively set an efficiency of the ERU.
 %
 % Copyright (C) 2022  Jeremy W. Simmons II
 % 
@@ -122,6 +124,7 @@ S_roArray = logspace(log10(1e3),log10(0.3e5),nS_ro);% [m^2] membrane area
 % Specify PTO configurations
 PTOarray = [1 1 3 3 4 1 1 3 3 4];
 design_case = [1 2 1 2 1 3 4 3 4 3];
+ERUconfig = (1)*ones(size(PTOarray)); % 0-w/o ERU; 1-w/ ERU
 nPTO = length(PTOarray);
 
 % Specify the set of sea-states to design for
@@ -136,7 +139,8 @@ for iPTO = iiPTO
     display(['Working on PTO ',num2str(iPTO),' of ',num2str(nPTO)])
     tic
     data(iPTO) = PTOsizing_multiSS(D_wArray,S_roArray, ...
-                 bounds,PTOarray(iPTO),design_case(iPTO),par);
+                 bounds,PTOarray(iPTO),design_case(iPTO), ...
+                 ERUconfig(iPTO),par);
     toc
 
     %%% Intermediate Save: time in ISO8601

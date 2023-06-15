@@ -1,4 +1,4 @@
-function  varargout = model_timeAvePTO(x,par,iPTO,outputConfig)
+function  varargout = model_timeAvePTO(x,par,iPTO,ERUconfig,outputConfig)
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % model_timeAvePTO.m function m-file
 % AUTHORS:
@@ -23,6 +23,8 @@ function  varargout = model_timeAvePTO(x,par,iPTO,outputConfig)
 % 12/31/2021 - created.
 % 08/22/2022 - Added constraint on WEC-driven torque to be less than
 % max for supplied torque-power data.
+% 06/15/2023 - add optional ERU (ERUconfig=0 -> w/o ERU; ERUconfig=1 ->
+% w/ ERU). Values between 0 and 1 effectively set an efficiency of the ERU.
 %
 % Copyright (C) 2022  Jeremy W. Simmons II
 % 
@@ -60,8 +62,8 @@ function  varargout = model_timeAvePTO(x,par,iPTO,outputConfig)
             PP_w = power(T_c);
             q_perm = (par.S_ro*par.A_w)*(p_f-par.p_osm);
             q_w = PP_w*par.eta_w/dp_w;
-            PP_gen = (q_w - q_perm) ...
-                *(p_f-par.p_c)*par.eta_pm*par.eta_gen;
+            PP_gen = (p_f-par.p_c)*par.eta_pm*par.eta_gen ...
+                    *(q_w - q_perm*(ERUconfig + (1-ERUconfig)/par.Y));
             
             
         case {3 4}
@@ -71,11 +73,11 @@ function  varargout = model_timeAvePTO(x,par,iPTO,outputConfig)
             PP_w = power(T_c);
             dp_w = T_c*par.eta_w/par.D_w;
             q_w = PP_w*par.eta_w/dp_w;
-            q_perm = q_w/duty;
+            q_perm = q_w/duty/(ERUconfig + (1-ERUconfig)/par.Y);
             p_f = q_perm/(par.S_ro*par.A_w) + par.p_osm;
-            PP_gen = par.eta_gen*q_perm ...
-                    *(duty*par.eta_pm*(p_h-p_f) ...
-                    - (1-duty)*(p_f-par.p_c)/par.eta_pm);
+            PP_gen = par.eta_gen*(duty*par.eta_pm*(p_h-p_f) ...
+                    - (1-duty)*(p_f-par.p_c)/par.eta_pm) ...
+                    *q_perm*(ERUconfig + (1-ERUconfig)/par.Y);
             
     end
     

@@ -1,4 +1,5 @@
-function data = PTOsizing_multiSS(D_wArray,S_roArray,bounds,iPTO,design_case,par)
+function data = PTOsizing_multiSS(D_wArray,S_roArray,bounds,iPTO, ...
+                                  design_case,ERUconfig,par)
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % PTOsizing_multiSS.m function m-file
 % AUTHORS:
@@ -69,6 +70,8 @@ function data = PTOsizing_multiSS(D_wArray,S_roArray,bounds,iPTO,design_case,par
 % 12/31/2021 - created.
 % 08/22/2022 - Corrected constraint on WEC-driven torque to be included in 
 % constraint function in the optimization.
+% 06/15/2023 - add optional ERU (ERUconfig=0 -> w/o ERU; ERUconfig=1 ->
+% w/ ERU). Values between 0 and 1 effectively set an efficiency of the ERU.
 %
 % Copyright (C) 2022  Jeremy W. Simmons II
 % 
@@ -193,10 +196,10 @@ function data = PTOsizing_multiSS(D_wArray,S_roArray,bounds,iPTO,design_case,par
                 S_ro(iD_w,iS_ro) = S_roArray(iS_ro);
                 
                 % Build the objective function for the current case
-                obj = @(x) 1/model_timeAvePTO(x.*x_scale,param,iPTO,1);
+                obj = @(x) 1/model_timeAvePTO(x.*x_scale,param,iPTO,ERUconfig,1);
                 
                 % Build the contraint function for the current case
-                nonlcon = @(x) model_timeAvePTO(x.*x_scale,param,iPTO,2);
+                nonlcon = @(x) model_timeAvePTO(x.*x_scale,param,iPTO,ERUconfig,2);
                 
                 % Execute optimization
                 x = fmincon(obj,x0,A,b,Aeq,beq,lb,ub,nonlcon,options);
@@ -219,7 +222,7 @@ function data = PTOsizing_multiSS(D_wArray,S_roArray,bounds,iPTO,design_case,par
                 % Calculate and record performance variables
                 [q_perm(iD_w,iS_ro,iSS),...
                  T_c(iD_w,iS_ro,iSS),...
-                 PP_w(iD_w,iS_ro,iSS)] = model_timeAvePTO(x.*x_scale,param,iPTO,3);
+                 PP_w(iD_w,iS_ro,iSS)] = model_timeAvePTO(x.*x_scale,param,iPTO,ERUconfig,3);
     
                 % modify permeate production rate with weight for sea state and
                 % feasibility of result. Weight is given as percentage.
