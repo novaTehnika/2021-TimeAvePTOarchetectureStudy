@@ -23,7 +23,8 @@ Z = 24*3600*[zeros(1,nS_ro+1);[zeros(nS_ro,1), data(iPTO).q_permTotal]];
 
 
 % loadColors
-levels = [500:500:4000];
+inc = 250;
+levels = [inc:inc:4000];
 % color1 = maroon;
 % color2 = gold;
 nlines = length(levels);
@@ -48,7 +49,7 @@ c1.LineWidth = lineWidth;
 % ax2.Visible = 'off';
 % ax2.XTick = [];
 % ax2.YTick = [];
-xlim([0 30])
+xlim([0 10])
 ylim([0 1])
 [M,I] = max(24*3600*data(iPTO).q_permTotal(:));
 
@@ -58,7 +59,41 @@ ylabel('Displacement (m^3/rad)')
 % zlabel('Permeate Production (L/s)')
 title(['Permeate Production (m^3/day): ',labelPTO(iPTO)])
 
+%% Plot production along specified pump displacement
+Dw_target = [0.1,0.2,0.3,0.4,0.5];
 
+bottomEdge = 1;
+leftEdge = 3;
+width = 3.5625; % one column: 3+9/16, two column: 7.5
+height = 2.75;
+fontSize = 8;
+lineWidth = 1.5;
+
+iPTO = 1;
+labelPTO = ["P-FF","P-VF","S-FF","S-VF","M-FF","P-FV","P-VV","S-FV","S-VV","M-FV"];
+legLabels = cell(length(Dw_target),1);
+
+f = figure;
+for i = 1:length(Dw_target)
+    iD_wArray = find(D_wArray <= Dw_target(i),1,'last');
+
+    X = 1e-3*[0,data(iPTO).S_ro(iD_wArray,:)];
+    Y = 24*3600*[0, data(iPTO).q_permTotal(iD_wArray,:)];
+
+    plot(X,Y,'LineWidth',lineWidth')
+    hold on
+    legLabels(i) = {[num2str(Dw_target(i)),'m^3/rad']};
+end
+
+xlim([0 10])
+
+leg = legend(char(legLabels));
+leg.Location = 'best';
+leg.FontSize = fontSize-1;
+leg.FontName = 'Times';
+
+xlabel('Membrane Area (1000 m^2)')
+title(['Permeate Production (m^3/day): ',labelPTO(iPTO)])
 %% Plot with specified levels and compared to Yu and Jenne 2017
 black = [0 0 0];
 maroon = [122 0 25]/256;
