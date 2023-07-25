@@ -121,8 +121,8 @@ S_roArray = [1500 3000 4500 6000 9000 ];% [m^2] membrane area
 nS_ro = length(S_roArray); % Size of array for permeate coefficient
 
 % Specify PTO configurations
-iiPTO = [1 1 3 3];
-design_case = [1 2 1 2];
+PTOarray = [1 1 3 3 4 1 1 3 3 4];
+design_case = [1 2 1 2 1 3 4 3 4 3];
 ERUconfig = (1)*ones(size(iiPTO)); % 0-w/o ERU; 1-w/ ERU
 nPTO = length(iiPTO);
 
@@ -135,7 +135,7 @@ par.SSset = SSset;
 for iPTO = 1:nPTO
     for iS_ro = 1:nS_ro
         data(iPTO,iS_ro) = PTOsizing_multiSS(D_wArray,S_roArray(iS_ro), ...
-                        bounds,iiPTO(iPTO),design_case(iPTO), ...
+                        bounds,PTOarray(iPTO),design_case(iPTO), ...
                         ERUconfig(iPTO),par);
     end
 end
