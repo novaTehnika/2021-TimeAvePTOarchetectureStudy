@@ -34,27 +34,21 @@
 %   along with this program. If not, see <https://www.gnu.org/licenses/>.
 %
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-iPTO = 7;
-D_wChoice = .261;
-S_roChoice = 2774;
+iPTO = 1;
+D_wChoice = .3;
+S_roChoice = 3000;
 
 studyType = 2; % selection for the type of study that was perfromed
                % 1 - 1D, pump displacement
                % 2 - 2D
 
-SSsetType = 2; % selection for set of sea states to display
+SSsetType = 1; % selection for set of sea states to display
                % 1-all in order by ID
                % 2-all in random order
                % 3-top 90% by yearly power in random order
                % 4-top 80% by yearly power in random order
                % 5-bottom 20% by yearly power in random order
                % 6-bottom 10% by yearly power in random order
-
-% load data if not already loaded
-if ~(exist('iiPTO','var') && iiPTO == iPTO)
-    load('dataFileNames.mat','dataFileName')
-    load(dataFileName(iPTO))
-end
 
 
 %% Specify sea states to include in the table
@@ -75,51 +69,15 @@ end
 
 %% find design values for a given combination specified by max disp. and RO module size
 switch studyType
-%% 1: for studies that index data variable with PTO type and membrane area
-    case 1
+    case 1 % for studies that index data variable with PTO type and membrane area
 iiS_ro = find(S_roArray <= S_roChoice, 1,'last');
 iD_wChoice = find(data(iPTO,iiS_ro).D_w(:,1) <= D_wChoice, 1,'last');
 iS_roChoice = 1;
 
-nSS = length(SSset);
-D_wDesign = zeros(nSS,1);
-S_roDesign = zeros(nSS,1);
-P_iDesign = zeros(nSS,1);
-q_perm_weighted = zeros(nSS,1);
-q_perm = zeros(nSS,1);
-feasible = zeros(nSS,1);
-for iSS = 1:nSS
-    iD_w = data(iPTO,iiS_ro).design(iD_wChoice,iS_roChoice,SSset(iSS)).iD_w;
-    iS_ro = data(iPTO,iiS_ro).design(iD_wChoice,iS_roChoice,SSset(iSS)).iS_ro;
-    q_perm_weighted(iSS) = data(iPTO,iiS_ro).design(iD_wChoice,iS_roChoice,SSset(iSS)).q_perm;
-    q_perm(iSS) = q_perm_weighted(SSset(iSS))/(par.weight(SSset(iSS))/100);
-    D_wDesign(iSS) = data(iPTO,iiS_ro).D_w(iD_w,1);
-    S_roDesign(iSS) = data(iPTO,iiS_ro).S_ro(1,iS_ro);
-    P_iDesign(iSS) = data(iPTO,iiS_ro).p_i(iD_w,iS_ro,SSset(iSS));
-    feasible(iSS) = data(iPTO,iiS_ro).feasible(iD_w,iS_ro,SSset(iSS));
-    if ~feasible(iSS)
-        D_wDesign(iSS) = nan;
-        S_roDesign(iSS) = nan;
-        P_iDesign(iSS) = nan;
-    end
-end
-
-if PTOarray(iPTO) == 2 || PTOarray(iPTO) == 4
-    dutyDesign = zeros(nSS,1);
-    for iSS = 1:nSS
-        iD_w = data(iPTO,iiS_ro).design(iD_wChoice,iS_roChoice,SSset(iSS)).iD_w;
-        iS_ro = data(iPTO,iiS_ro).design(iD_wChoice,iS_roChoice,SSset(iSS)).iS_ro;
-        dutyDesign(iSS) = data(iPTO,iiS_ro).duty(iD_w,iS_ro,SSset(iSS));
-        if ~feasible(iSS)
-            dutyDesign(iSS) = nan;
-        end
-    end
-end
-
-%% 1: for studies that index data variable with PTO type
-    case 2
+    case 2 % for studies that index data variable with PTO type
 iD_wChoice = find(data(iPTO).D_w(:,1) <= D_wChoice, 1,'last');
 iS_roChoice = find(data(iPTO).S_ro(1,:) <= S_roChoice, 1,'last');
+end
 
 nSS = length(SSset);
 D_wDesign = zeros(nSS,1);
@@ -127,16 +85,20 @@ S_roDesign = zeros(nSS,1);
 P_iDesign = zeros(nSS,1);
 q_perm_weighted = zeros(nSS,1);
 q_perm = zeros(nSS,1);
+PP_wDesign = zeros(nSS,1);
+PP_genDesign = zeros(nSS,1);
+PP_cDesign = zeros(nSS,1);
 feasible = zeros(nSS,1);
 for iSS = 1:nSS
-    iD_w = data(iPTO).design(iD_wChoice,iS_roChoice,SSset(iSS)).iD_w;
-    iS_ro = data(iPTO).design(iD_wChoice,iS_roChoice,SSset(iSS)).iS_ro;
     q_perm_weighted(iSS) = data(iPTO).design(iD_wChoice,iS_roChoice,SSset(iSS)).q_perm;
     q_perm(iSS) = q_perm_weighted(iSS)/(par.weight(SSset(iSS))/100);
-    D_wDesign(iSS) = data(iPTO).D_w(iD_w,1);
-    S_roDesign(iSS) = data(iPTO).S_ro(iD_w,iS_ro);
-    P_iDesign(iSS) = data(iPTO).p_i(iD_w,iS_ro,SSset(iSS));
-    feasible(iSS) = data(iPTO).feasible(iD_w,iS_ro,SSset(iSS));
+    D_wDesign(iSS) = data(iPTO).design(iD_wChoice,iS_roChoice,SSset(iSS)).D_w;
+    S_roDesign(iSS) = data(iPTO).design(iD_wChoice,iS_roChoice,SSset(iSS)).S_ro;
+    P_iDesign(iSS) = data(iPTO).design(iD_wChoice,iS_roChoice,SSset(iSS)).p_i;
+    PP_wDesign(iSS) = data(iPTO).design(iD_wChoice,iS_roChoice,SSset(iSS)).PP_w;
+    PP_genDesign(iSS) = data(iPTO).design(iD_wChoice,iS_roChoice,SSset(iSS)).PP_gen;
+    PP_cDesign(iSS) = data(iPTO).design(iD_wChoice,iS_roChoice,SSset(iSS)).PP_c;
+    feasible(iSS) = data(iPTO).design(iD_wChoice,iS_roChoice,SSset(iSS)).feasible;
     if ~feasible(iSS)
         D_wDesign(iSS) = nan;
         S_roDesign(iSS) = nan;
@@ -147,15 +109,11 @@ end
 if PTOarray(iPTO) == 2 || PTOarray(iPTO) == 4
     dutyDesign = zeros(nSS,1);
     for iSS = 1:nSS
-        iD_w = data(iPTO).design(iD_wChoice,iS_roChoice,SSset(iSS)).iD_w;
-        iS_ro = data(iPTO).design(iD_wChoice,iS_roChoice,SSset(iSS)).iS_ro;
-        dutyDesign(iSS) = data(iPTO).duty(iD_w,iS_ro,SSset(iSS));
+        dutyDesign(iSS) = data(iPTO).design(iD_wChoice,iS_roChoice,SSset(iSS)).duty;
         if ~feasible(iSS)
             dutyDesign(iSS) = nan;
         end
     end
-end
-
 end
 
 %% make table
@@ -163,18 +121,42 @@ end
 switch PTOarray(iPTO)
     case {1 3}
         varNames = {'Sea State','Displacement (m^3/rad)','S_ro(m^2)', ...
-            'Permeate Prod. (m^3/day)','Weighted Permeate Prod. (m^3/day))', ...
-            'P_i (MPa)','Feasible (T/F)'};
+            'P_i (MPa)', ...
+            'Permeate Prod. (m^3/day)','Weighted Permeate Prod. (m^3/day)', ...
+            'WEC Power Capture (kW)','Elec. Power Generation (kW)','Charge Pump Power Consumption (kW)', ...
+            'Feasible (T/F)'};
         T_D = table(SSset,D_wDesign,S_roDesign, ...
+            1e-6*P_iDesign, ...
             24*3600*q_perm,24*3600*q_perm_weighted, ...
-            1e-6*P_iDesign,feasible, ...
+            1e-3*PP_wDesign,1e-3*PP_genDesign,1e-3*PP_cDesign, ...
+            feasible, ...
             'VariableNames',varNames)
     case {2 4}
         varNames = {'Sea State','Displacement (m^3/rad)','S_ro (m^2)', ...
-            'Permeate Prod. (m^3/day))','Weighted Permeate Prod. (m^3/day))', ...
-            'P_i (MPa)','duty','Feasible (T/F)'};
+            'P_i (MPa)','duty', ...
+            'Permeate Prod. (m^3/day)','Weighted Permeate Prod. (m^3/day)', ...
+            'WEC Power Capture (kW)','Elec. Power Generation (kW)','Charge Pump Power Consumption (kW)', ...
+            'Feasible (T/F)'};
         T_D = table(SSset,D_wDesign,S_roDesign, ...
+            1e-6*P_iDesign,dutyDesign, ...
             24*3600*q_perm,24*3600*q_perm_weighted, ...
-            1e-6*P_iDesign,dutyDesign,feasible, ...
-                    'VariableNames',varNames)
+            1e-3*PP_wDesign,1e-3*PP_genDesign,1e-3*PP_cDesign, ...
+            feasible, ...
+            'VariableNames',varNames)
+end
+
+%% make water table
+
+Hs_2D = unique(par.Hs);
+nHs = length(Hs_2D);
+Tp_2D = unique(par.Tp);
+nTp = length(Tp_2D);
+q_perm_2D = zeros(nHs,nTp);
+q_perm_weighted_2D = zeros(nHs,nTp);
+
+for j = 1:nHs
+    for k = 1:nTp
+        q_perm_2D(j,k) = sum(q_perm(:).*((par.Hs(SSset) == Hs_2D(j)) & (par.Tp(SSset) == Tp_2D(k)))');
+        q_perm_weighted_2D(j,k) = sum(q_perm_weighted(:).*((par.Hs(SSset) == Hs_2D(j)) & (par.Tp(SSset) == Tp_2D(k)))');
+    end
 end

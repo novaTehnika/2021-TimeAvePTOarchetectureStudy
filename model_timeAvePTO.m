@@ -95,7 +95,7 @@ function  varargout = model_timeAvePTO(x,par,iPTO,ERUconfig,outputConfig)
             ceq = [];
             varargout = {c,ceq};
         case 3
-            varargout = {q_perm, T_c, PP_w};
+            varargout = {q_perm, T_c, PP_w, PP_gen, PP_c};
     end
 
 end
