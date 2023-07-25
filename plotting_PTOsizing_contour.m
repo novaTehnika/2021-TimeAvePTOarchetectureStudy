@@ -76,14 +76,25 @@ legLabels = cell(length(Dw_target),1);
 f = figure;
 for i = 1:length(Dw_target)
     iD_wArray = find(D_wArray <= Dw_target(i),1,'last');
+    iSro = find(24*3600*data(iPTO).q_permTotal(iD_wArray,:) > 50);
 
-    X = 1e-3*[0,data(iPTO).S_ro(iD_wArray,:)];
-    Y = 24*3600*[0, data(iPTO).q_permTotal(iD_wArray,:)];
+    X = 1e-3*[data(iPTO).S_ro(iD_wArray,iSro)];
+    Y = 24*3600*[data(iPTO).q_permTotal(iD_wArray,iSro)];
 
-    plot(X,Y,'LineWidth',lineWidth')
+    s = scatter(X,Y,'.')
+    s.SizeData = 100;
     hold on
     legLabels(i) = {[num2str(Dw_target(i)),'m^3/rad']};
 end
+
+iD_wArray = find(D_wArray <= 0.3,1,'last');
+iSro = find(data(iPTO).S_ro(iD_wArray,:) <= 1500,1,'last');
+X = 1e-3*[data(iPTO).S_ro(iD_wArray,iSro)];
+Y = 24*3600*[data(iPTO).q_permTotal(iD_wArray,iSro)];
+s = scatter(X,Y,'xk')
+s.SizeData = 100;
+s.LineWidth = 5;
+legLabels(i+1) = {['Selected design, 0.3m^3/rad']};
 
 xlim([0 10])
 
@@ -92,8 +103,9 @@ leg.Location = 'best';
 leg.FontSize = fontSize-1;
 leg.FontName = 'Times';
 
-xlabel('Membrane Area (1000 m^2)')
-title(['Permeate Production (m^3/day): ',labelPTO(iPTO)])
+xlabel('membrane area (1000 m^2)')
+ylabel('production (m^3/day)')
+title(['Annual Average Water Production'])
 %% Plot with specified levels and compared to Yu and Jenne 2017
 black = [0 0 0];
 maroon = [122 0 25]/256;
