@@ -1,26 +1,27 @@
-% study_PTOsizing.m script m-file
+% run_PTOsizing.m script m-file
 % AUTHORS:
 % Jeremy Simmons (email: simmo536@umn.edu)
 % University of Minnesota
 % Department of Mechanical Engineering
 %
 % CREATION DATE:
-% December 31, 2021
+% July 24, 2023
 %
 % PURPOSE:
-% The purpose of this script is to perform a design study of PTO
-% architectures for wave-powered reverse osmosis operating in a known 
-% distibution of sea conditions. The script is set up to
-% perform the same study for four different PTO architectures. 
+% The purpose of this script is to perform a design for a wave-powered 
+% reverse osmosis system operating in a known distibution of sea conditions
+% given a PTO architecture, WEC-driven pump displacement, and install RO 
+% membrane area. The design is specified in the script under the section
+% heading "Variables".
 % 
-% The models used in the design study are simple, static models with that 
+% The models used in the design are simple, static models with that 
 % include two-way coupling with the time-averaged simulation results of a
 % WEC; the coupling is set up such that the reaction force from the PTO is   
 % a function of the average WEC speed (or power absortion) and the average 
 % WEC speed (or power absorption) is function of the reaction torque from 
 % the PTO.
 %
-% In the design study, the WEC-driven pump displacement and RO module
+% In the design, the WEC-driven pump displacement and RO module
 % membrane area are varied across a grid of values. For each set
 % of these design variables, an optimization is performed to select the
 % nominal operating pressure of the system (either the RO feed pressure or 
@@ -64,13 +65,12 @@
 % parameters_timeAvePTO.m
 % loadColors.m
 % data_coulombPTO_dampingStudy_24-Aug-2022_1_slim.mat
+% data_coulombPTO_dampingStudy_6SS_20230724_slim.mat
 %
 % UPDATES
-% 12/31/2021 - created.
-% 06/15/2023 - add optional ERU (ERUconfig=0 -> w/o ERU; ERUconfig=1 ->
-% w/ ERU). Values between 0 and 1 effectively set an efficiency of the ERU.
+% 07/24/2023 - created from study_PTOsizing.m.
 %
-% Copyright (C) 2022  Jeremy W. Simmons II
+% Copyright (C) 2023  Jeremy W. Simmons II
 % 
 %   This program is free software: you can redistribute it and/or modify
 %   it under the terms of the GNU General Public License as published by
@@ -100,7 +100,15 @@ bounds.p_w_bnds = [4e6 30e6]; % [Pa/Pa] Bounds for pressure at WEC driven pump
 bounds.D_bnds = [0.1 1]; % [-] bounds for valve switching duty
 
 % WEC: load time averaged results for WEC performance
-filename_WECpowerCurve = 'data_coulombPTO_dampingStudy_20220927_slim.mat';
+switch 2
+    case 1
+        filename_WECpowerCurve = 'data_coulombPTO_dampingStudy_20220927_slim.mat';
+        SSset = 1:114;
+    case 2
+        filename_WECpowerCurve = 'data_coulombPTO_dampingStudy_6SS_20230724_slim.mat';
+        SSset = 1:6;
+end
+par.SSset = SSset;
 load(filename_WECpowerCurve)
 par.T_c_data = T_c_data; % [Nm] Torque applied to WEC by PTO
 par.PP_w_data = PP_w_data; % [W] Power transmitted by WEC to PTO
@@ -109,39 +117,49 @@ par.Hs = Hs;
 par.Tp = Tp;
 clearvars T_c_data PP_w_data weight Hs Tp
 
-%% %%%%%%%%%%%%   Study Variables  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% WEC-driven pump displacment
-nD_w = 11; % Size of array for displacment
-% D_w = linspace(0.05,2,nD_w);
-D_wArray = logspace(log10(0.01),log10(.75),nD_w); % [m^3/s] displacement
-
-% membrane area in Ro module
-S_roArray = [1500 3000 4500 6000 9000 ];% [m^2] membrane area
-nS_ro = length(S_roArray); % Size of array for permeate coefficient
-
-% Specify PTO configurations
+%% %%%%%%%%%%%%   Variables  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Available PTO configurations
 PTOarray = [1 1 3 3 4 1 1 3 3 4];
 design_case = [1 2 1 2 1 3 4 3 4 3];
-ERUconfig = (1)*ones(size(iiPTO)); % 0-w/o ERU; 1-w/ ERU
-nPTO = length(iiPTO);
 
-% Specify the set of sea-states to design for
-SSset = [1:114];
-par.SSset = SSset;
+% Specified design
+iPTO = 1;
+ % WEC-driven pump displacement
+D_w = 0.3;
+f_D_w = 0.25;
+inc_D_w = (0.05)*D_w;
+ % Total Ro membrane area;
+S_ro = 3000;
+f_S_ro = 0;
+inc_S_ro = 37;
+ % ERU configuration
+ERUconfig = 1; % 0-w/o ERU; 1-w/ ERU
+
+% Create array of displacement and memebrane area if these are variable.
+ % WEC-driven pump displacment
+if design_case(iPTO) == 2 || design_case(iPTO) == 4
+    min_D_w = inc_D_w*(floor(f_D_w*D_w/inc_D_w)+(mod(D_w*f_D_w,inc_D_w)>0));
+    D_wArray  = min_D_w:inc_D_w:D_w; % [m^3/s] displacement
+else
+    D_wArray = D_w;
+end
+
+ % membrane area in RO module
+if design_case(iPTO) == 3 || design_case(iPTO) == 4
+    min_S_ro = inc_S_ro*(floor(f_S_ro*S_ro/inc_S_ro)+(mod(S_ro*f_S_ro,inc_S_ro)>0));
+    S_roArray  = min_S_ro:inc_S_ro:S_ro; % [m^3/s] displacement
+else
+    S_roArray = S_ro;
+end
 
 %% %%%%%%%%%%%%   COLLECT DATA  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-for iPTO = 1:nPTO
-    for iS_ro = 1:nS_ro
-        data(iPTO,iS_ro) = PTOsizing_multiSS(D_wArray,S_roArray(iS_ro), ...
-                        bounds,PTOarray(iPTO),design_case(iPTO), ...
-                        ERUconfig(iPTO),par);
-    end
-end
+data = PTOsizing_multiSS(D_wArray,S_roArray, ...
+                bounds,PTOarray(iPTO),design_case(iPTO), ...
+                ERUconfig,par);
 
 %% %%%%%%%%%%%%   SAVE DATA   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-filename = ['data_PTOsizing_',date];
+filename = ['data_PTOsizing_',datetime('today')];
 files = ls;
 nfiles = size(files,1);
 k = 1;
@@ -151,94 +169,3 @@ for j = 1:nfiles
     end
 end
 save([filename,'_',num2str(k)])
-
-return
-
-%% %%%%%%%%%%%%   PLOTTING  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% Cost Model
-
-
-%% Plot results for each architecture on same plot
-lines = [{'-'},{'-.'},{'--'},{':'},{':'}];
-marker = [{'x'},{'s'},{'^'},{'*'}];
-loadColors;
-C = [black; maroon; blue; green];
-figure
-hold on
-for iPTO = 1:nPTO
-    for iS_ro = 1:nS_ro
-        p(iPTO,iS_ro) = plot(1e3*data(iPTO,iS_ro).D_w(:),...
-            1e3*data(iPTO,iS_ro).q_permTotal(:),...
-            'Color', C(iPTO,:),'lineStyle',cell2mat(lines(iS_ro)),'lineWidth',1.5);
-        p(iPTO,iS_ro).Annotation.LegendInformation.IconDisplayStyle = 'off';
-    end
-end
-
-xLim = xlim;
-yLim = ylim;
-for iPTO = 1:nPTO
-    scatter(-999,-999,50,C(iPTO,:),'filled','s')
-end
-for iS_ro = 1:nS_ro
-    plot([-999 -998],[-999 -999],...
-        'k','lineStyle',cell2mat(lines(iS_ro)),'lineWidth',1.5);
-end
-xlim(xLim)
-ylim(yLim)
-
-legend('PTO 1','PTO 2','PTO 3','PTO 4',...
-    ['S_{ro}=',num2str(S_roArray(1)),'m^2'],...
-    ['S_{ro}=',num2str(S_roArray(2)),'m^2'],...
-    ['S_{ro}=',num2str(S_roArray(3)),'m^2'])
-xlabel('Displacement (L/rad)')
-ylabel('Permeate Production (L/s)')
-title('Design Performance')
-
-
-
-%% Plotting Results
-% Cost normalized by the cost per RO size
-cost = @(D_w,S_ro,q_perm,lam_1,lam_2) ...
-    (D_w + lam_1*S_ro + lam_2)./zero2nan(q_perm);
-
-lines = [{'-'},{'-.'},{'--'},{':'}];
-marker = [{'x'},{'s'},{'^'},{'*'}];
-loadColors;
-C = [black; maroon; blue; green];
-figure
-hold on
-for iPTO = 1:nPTO
-    for iS_ro = 1:nS_ro
-        p(iPTO,iS_ro) = plot(1e3*data(iPTO,iS_ro).D_w(:),...
-            cost(data(iPTO,iS_ro).D_w(:),S_roArray(iS_ro),24*3600*data(iPTO,iS_ro).q_permTotal(:),0.001,0.5),...
-            'Color', C(iPTO,:),'lineStyle',cell2mat(lines(iS_ro)),'lineWidth',1.5);
-        p(iPTO,iS_ro).Annotation.LegendInformation.IconDisplayStyle = 'off';
-    end
-end
-
-xLim = xlim;
-yLim = ylim;
-for iPTO = 1:nPTO
-    scatter(-999,-999,50,C(iPTO,:),'filled','s')
-end
-for iS_ro = 1:nS_ro
-    plot([-999 -998],[-999 -999],...
-        'k','lineStyle',cell2mat(lines(iS_ro)),'lineWidth',1.5);
-end
-xlim(xLim)
-ylim(yLim)
-
-legend('PTO 1','PTO 2','PTO 3','PTO 4',...
-    ['S_{ro}=',num2str(S_roArray(1)),'m^2'],...
-    ['S_{ro}=',num2str(S_roArray(2)),'m^2'],...
-    ['S_{ro}=',num2str(S_roArray(3)),'m^2'])
-xlabel('Displacement (L/rad)')
-ylabel('Permeate Production (L/s)')
-title('Design Performance')
-
-%% mark minimum cost design
-[~,iS_ro] = min(min(cost(1e3*D_w,S_ro,24*3600*q_permTotal,0.1,0.5)));
-[~,iD_w] = min(cost(1e3*D_w(:,iS_ro),S_ro(:,iS_ro),24*3600*q_permTotal(:,iS_ro),0.1,0.5));
-scatter(1e6*S_roArray(iS_ro),1e3*D_wArray(iD_w),50,'r*')
-

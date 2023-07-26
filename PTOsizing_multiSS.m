@@ -1,4 +1,5 @@
-function data = PTOsizing_multiSS(D_wArray,S_roArray,bounds,iPTO,design_case,par)
+function data = PTOsizing_multiSS(D_wArray,S_roArray,bounds,iPTO, ...
+                                  design_case,ERUconfig,par)
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % PTOsizing_multiSS.m function m-file
 % AUTHORS:
@@ -69,6 +70,8 @@ function data = PTOsizing_multiSS(D_wArray,S_roArray,bounds,iPTO,design_case,par
 % 12/31/2021 - created.
 % 08/22/2022 - Corrected constraint on WEC-driven torque to be included in 
 % constraint function in the optimization.
+% 06/15/2023 - add optional ERU (ERUconfig=0 -> w/o ERU; ERUconfig=1 ->
+% w/ ERU). Values between 0 and 1 effectively set an efficiency of the ERU.
 %
 % Copyright (C) 2022  Jeremy W. Simmons II
 % 
@@ -159,6 +162,8 @@ function data = PTOsizing_multiSS(D_wArray,S_roArray,bounds,iPTO,design_case,par
     S_ro = zeros(nD_w, nS_ro); % [m^3/Pa.s] Permeate coefficient
     T_c = zeros(nD_w, nS_ro, nSS); % [Nm] Torque applied to WEC by PTO
     PP_w = zeros(nD_w, nS_ro, nSS); % [W] Power transmitted to PTO by WEC
+    PP_gen = zeros(nD_w, nS_ro, nSS); % [W] Elec. power generated
+    PP_c = zeros(nD_w, nS_ro, nSS); % [W] Elec. power consumed by charge pump
     c = zeros(nD_w, nS_ro, nSS,4); % Constraint variables (c < 0)
     feasible = zeros(nD_w,nS_ro,nSS);
     p_i = zeros(nD_w, nS_ro, nSS); % [Pa] Operating pressure
@@ -169,7 +174,7 @@ function data = PTOsizing_multiSS(D_wArray,S_roArray,bounds,iPTO,design_case,par
     % parameters.
     
     % loop through WEC-pump displacement
-    parfor iD_w = 1:nD_w
+    for iD_w = 1:nD_w
         param = par; % pass parameter structure to par-for loop
         
         % Set WEC-driven pump displacement
@@ -193,10 +198,10 @@ function data = PTOsizing_multiSS(D_wArray,S_roArray,bounds,iPTO,design_case,par
                 S_ro(iD_w,iS_ro) = S_roArray(iS_ro);
                 
                 % Build the objective function for the current case
-                obj = @(x) 1/model_timeAvePTO(x.*x_scale,param,iPTO,1);
+                obj = @(x) 1/model_timeAvePTO(x.*x_scale,param,iPTO,ERUconfig,1);
                 
                 % Build the contraint function for the current case
-                nonlcon = @(x) model_timeAvePTO(x.*x_scale,param,iPTO,2);
+                nonlcon = @(x) model_timeAvePTO(x.*x_scale,param,iPTO,ERUconfig,2);
                 
                 % Execute optimization
                 x = fmincon(obj,x0,A,b,Aeq,beq,lb,ub,nonlcon,options);
@@ -219,7 +224,9 @@ function data = PTOsizing_multiSS(D_wArray,S_roArray,bounds,iPTO,design_case,par
                 % Calculate and record performance variables
                 [q_perm(iD_w,iS_ro,iSS),...
                  T_c(iD_w,iS_ro,iSS),...
-                 PP_w(iD_w,iS_ro,iSS)] = model_timeAvePTO(x.*x_scale,param,iPTO,3);
+                 PP_w(iD_w,iS_ro,iSS),...
+                 PP_gen(iD_w,iS_ro,iSS),...
+                 PP_c(iD_w,iS_ro,iSS)] = model_timeAvePTO(x.*x_scale,param,iPTO,ERUconfig,3);
     
                 % modify permeate production rate with weight for sea state and
                 % feasibility of result. Weight is given as percentage.
@@ -294,8 +301,24 @@ function data = PTOsizing_multiSS(D_wArray,S_roArray,bounds,iPTO,design_case,par
                                         .* (D_w(:,:) <= D_wArray(iD_w) ...
                                         & S_ro(:,:) <= S_roArray(iS_ro)));
                 end
-                design(iD_w,iS_ro,iSS) = temp;
-                                
+                design(iD_w,iS_ro,iSS).q_perm = temp.q_perm;
+                design(iD_w,iS_ro,iSS).D_w = ...
+                                        D_wArray(temp.iD_w);
+                design(iD_w,iS_ro,iSS).S_ro = ...
+                                        S_roArray(temp.iS_ro);
+                design(iD_w,iS_ro,iSS).p_i = ...
+                                        p_i(temp.iD_w,temp.iS_ro,iSS);
+                design(iD_w,iS_ro,iSS).duty = ...
+                                        duty(temp.iD_w,temp.iS_ro,iSS);
+                design(iD_w,iS_ro,iSS).PP_w = ...
+                                        PP_w(temp.iD_w,temp.iS_ro,iSS);
+                design(iD_w,iS_ro,iSS).PP_gen = ...
+                                        PP_gen(temp.iD_w,temp.iS_ro,iSS);
+                design(iD_w,iS_ro,iSS).PP_c = ...
+                                        PP_c(temp.iD_w,temp.iS_ro,iSS);
+                design(iD_w,iS_ro,iSS).feasible = ...
+                                        feasible(temp.iD_w,temp.iS_ro,iSS);
+
             end
             % Sum contributions to total production results
             q_permTotal(iD_w,iS_ro) = sum([design(iD_w,iS_ro,:).q_perm]);
@@ -304,15 +327,19 @@ function data = PTOsizing_multiSS(D_wArray,S_roArray,bounds,iPTO,design_case,par
     end
     
     %% Package results
+     % Results given displacement and membrane area
     data.par = par;
-    data.D_w = D_w;
-    data.S_ro = S_ro;
+    data.D_w = D_w; % given displacement
+    data.S_ro = S_ro; % given membrane area
     data.p_i = p_i;
     data.duty = duty;
-    
-    data.q_permTotal = q_permTotal;
     data.feasible = feasible;
-    
+    data.PP_w = PP_w;
+    data.PP_gen = PP_gen;
+    data.PP_c = PP_c;
+
+     % Results of optimal performance for the given PTO architecture
+    data.q_permTotal = q_permTotal;
     data.design = design;
 
 end
