@@ -83,9 +83,13 @@ for i = 1:length(Dw_target)
 
     s = scatter(X,Y,'.')
     s.SizeData = 100;
+
+    % plot(X,Y,'LineWidth',lineWidth')
+
     hold on
     legLabels(i) = {[num2str(Dw_target(i)),'m^3/rad']};
 end
+
 
 iD_wArray = find(D_wArray <= 0.3,1,'last');
 iSro = find(data(iPTO).S_ro(iD_wArray,:) <= 1500,1,'last');
@@ -106,6 +110,8 @@ leg.FontName = 'Times';
 xlabel('membrane area (1000 m^2)')
 ylabel('production (m^3/day)')
 title(['Annual Average Water Production'])
+title(['Annual Average Water Production: ',labelPTO(iPTO)])
+
 %% Plot with specified levels and compared to Yu and Jenne 2017
 black = [0 0 0];
 maroon = [122 0 25]/256;
