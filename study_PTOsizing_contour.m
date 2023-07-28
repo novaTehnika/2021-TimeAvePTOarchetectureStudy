@@ -144,16 +144,25 @@ for iPTO = iiPTO
     toc
 
     %%% Intermediate Save: time in ISO8601
-    filename = ['data_intermediateSave_PTO',num2str(iPTO),...
-                    '-',datestr(now,'yyyymmddTHHMMSS')];
-    save(filename)
+    if numel(iiPTO) == 1
+        filename = ['data_PTO',num2str(iPTO,'%02.f'),...
+                    '_',char(datetime("now",'Format','yyyyMMdd'))];
+    else
+        filename = ['data_intermediateSave_PTO',num2str(iPTO,'%02.f'),...
+                    '_',char(datetime("now",'Format','yyyyMMddHHmm'))];  
+    end
+    save(filename,'-v7.3')
     %%%
 
 end
 
 %% %%%%%%%%%%%%   SAVE DATA   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-filename = ['data_PTOsizing_contour_',datestr(now,'yyyymmddTHHMMSS')];
-save(filename)
+if numel(iiPTO) ~= 1
+    filename = ['data_PTOsizing_contour_',char(datetime("now",'Format','yyyyMMdd'))];
+    save(filename,'-v7.3')
+end
+
+poolobj = gcp('nocreate'); delete(poolobj);
 
 return
 

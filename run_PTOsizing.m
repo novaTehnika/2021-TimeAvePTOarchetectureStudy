@@ -159,13 +159,16 @@ data = PTOsizing_multiSS(D_wArray,S_roArray, ...
                 ERUconfig,par);
 
 %% %%%%%%%%%%%%   SAVE DATA   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-filename = ['data_PTOsizing_',datetime('today')];
+filename = ['data_PTOsizing_',char(datetime("now",'Format','yyyyMMdd'))];
 files = ls;
 nfiles = size(files,1);
 k = 1;
 for j = 1:nfiles
-    if strfind(files(j,:),filename)
+    if contains(files(j,:),filename)
         k = k+1;
+        filenameTag = ['_',num2str(k)];
+    else
+        filenameTag = [];
     end
 end
-save([filename,'_',num2str(k)])
+save([filename,filenameTag],'-v7.3')
