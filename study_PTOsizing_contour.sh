@@ -9,7 +9,7 @@
 #SBATCH -o %A.out
 #SBATCH -e %A.err
 
-cd ~/2021Q3-PTO-archetecture-sizing
+cd ~/2021-TimeAvePTOarchetectureStudy
 module load matlab
 matlab -nodisplay -r \
 "parpool('local',$SLURM_JOB_CPUS_PER_NODE); \
