@@ -174,7 +174,7 @@ function data = PTOsizing_multiSS(D_wArray,S_roArray,bounds,iPTO, ...
     % parameters.
     
     % loop through WEC-pump displacement
-    for iD_w = 1:nD_w
+    parfor iD_w = 1:nD_w
         param = par; % pass parameter structure to par-for loop
         
         % Set WEC-driven pump displacement
