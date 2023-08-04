@@ -22,7 +22,7 @@ D_w_PFF = 0.26; % [m^3/rad]
 S_ro_PFF = 2750; % [m^2]
 q_permTotal_PFF = 0.018365098;%(500)/24/3600; % [m^3/day -> m^3/s]
 
-switch 2
+switch 1
     case 1
         D_w_ref = D_w_YuJenne2017;
         S_ro_ref = S_ro_YuJenne2017;
@@ -37,10 +37,10 @@ end
 % S_ro_case2 = zeros(nPTO,1);
 % q_permTotal_case3 = zeros(nPTO,1);
 
-for iPTO = 6:nPTO
+for iPTO = iiPTO
     display(['PTO ',num2str(iPTO),' of ',num2str(nPTO)])
     
-    load(char(dataFilenames(iPTO,:)),'data','D_wArray','S_roArray')
+    % load(char(dataFilenames(iPTO,:)),'data','D_wArray','S_roArray')
     
     % Case 1: Pump displacement based on equivalent membrane area and permeate
     % production
