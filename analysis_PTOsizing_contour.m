@@ -18,9 +18,9 @@ D_w_YuJenne2017 = 0.5466; % [m^3/rad]
 S_ro_YuJenne2017 = 2162; % [m^2]
 q_permTotal_YuJenne2017 = (1476)/24/3600; % [m^3/day -> m^3/s]
 
-D_w_PFF = 0.26; % [m^3/rad]
-S_ro_PFF = 2750; % [m^2]
-q_permTotal_PFF = 0.018365098;%(500)/24/3600; % [m^3/day -> m^3/s]
+D_w_PFF = 0.23; % [m^3/rad]
+S_ro_PFF = 3700; % [m^2]
+q_permTotal_PFF = 0.0175673200663364;%(500)/24/3600; % [m^3/day -> m^3/s]
 
 switch 1
     case 1

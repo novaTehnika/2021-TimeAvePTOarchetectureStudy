@@ -134,9 +134,14 @@ D_w_YuJenne2017 = 0.5466; % [m^3/rad]
 S_ro_YuJenne2017 = (2162)/1e3; % [1000m^2]
 q_permTotal_YuJenne2017 = 1780; % [m^3/day]
 q_permTotal_YuJenne2017_wPRV = 1480; % [m^3/day]
-refColor = 'r';
+refColor_YuJenne2017 = 'r';
 
-iPTO = iiPTO;
+D_w_PFF = 0.23; % [m^3/rad]
+S_ro_PFF = 3700/1e3; % [m^2]
+q_permTotal_PFF = 0.0175673200663364*24*3600; % [m^3/day -> m^3/s]
+refColor_PFF = blue;
+
+% iPTO = iiPTO;
 labelPTO = ["P-FF","P-VF","S-FF","S-VF","M-FF", ...
             "P-FV","P-VV","S-FV","S-VV","M-FV"];
 
@@ -165,20 +170,37 @@ c1.HandleVisibility='off';
 % reference contour for Yu and Jenne performance
 [~,c2] = contour(X,Y,Z,[0 q_permTotal_YuJenne2017_wPRV],'--','ShowText','off');
 c2.LineWidth = lineWidth*2;
-c2.LineColor = refColor;
+c2.LineColor = refColor_YuJenne2017;
 c2.HandleVisibility='off';
 
 % dummy plots for legend
 p1 = plot(-99*[1, 0.5],-99*[1, 0.5],'-');
 p1.LineWidth = c1.LineWidth;
 p1.Color = c1.LineColor;
+p1.LineStyle = c1.LineStyle;
+
 p2 = plot(-99*[1 1],-99*[1 1],'--');
 p2.LineWidth = c2.LineWidth;
 p2.Color = c2.LineColor;
+p2.LineStyle = c2.LineStyle;
 
-s1 = scatter(S_ro_YuJenne2017,D_w_YuJenne2017,50,refColor,'x','LineWidth',lineWidth);
+s1 = scatter(S_ro_YuJenne2017,D_w_YuJenne2017,100,refColor_YuJenne2017,'^','LineWidth',lineWidth);
 
-xlim([0 30])
+% reference contour for PFF performance
+[~,c3] = contour(X,Y,Z,[0 q_permTotal_PFF],':','ShowText','off');
+c3.LineWidth = lineWidth*2;
+c3.LineColor = refColor_PFF;
+c3.HandleVisibility='off';
+
+% dummy plot for legend
+p3 = plot(-99*[1 1],-99*[1 1],'--');
+p3.LineWidth = c3.LineWidth;
+p3.Color = c3.LineColor;
+p3.LineStyle = c3.LineStyle;
+
+s2 = scatter(S_ro_PFF,D_w_PFF,100,refColor_PFF,'o','LineWidth',lineWidth);
+
+xlim([0 20])
 ylim([0 1])
 
 clabel(C,c1,'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
@@ -188,8 +210,8 @@ ylabel('displacement (m^3/rad)',...
     'FontSize',fontSize-1,'fontname','Times')
 title("Permeate Production (m^3/day): "+labelPTO(iPTO),...
     'FontSize',fontSize,'fontname','Times')
-if iPTO == 5 || iPTO == 10
-    switch 2
+if iPTO == 3 || iPTO == 4 || iPTO == 5 || iPTO == 8 || iPTO == 9 || iPTO == 10
+    switch 1
         case 1
             title("Permeate Production (m^3/day): "+labelPTO(iPTO)+...
                 " with 30 MPa Limit",...
@@ -206,7 +228,9 @@ end
 % "reference design producing " + num2str(q_permTotal_YuJenne2017_wPRV)+"m^3/day"];
 legLabels = [labelPTO(iPTO),...
 labelPTO(iPTO)+" at " + num2str(q_permTotal_YuJenne2017_wPRV) + " m^3/day", ...
-"reference design"];
+"ref. design Yu and Jenne 2017",...
+labelPTO(iPTO)+" at " + num2str(q_permTotal_PFF,4) + " m^3/day", ...
+"ref. design PFF"];
 leg = legend(legLabels);
 leg.Location = 'best';
 leg.FontSize = fontSize-1;
