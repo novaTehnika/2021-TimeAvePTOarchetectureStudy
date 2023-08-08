@@ -167,44 +167,62 @@ c1.LineWidth = lineWidth;
 c1.LineColor = 'k';
 c1.HandleVisibility='off';
 
-% reference contour for Yu and Jenne performance
+% reference contours
+ % contour for ref, Yu and Jenne
 [~,c2] = contour(X,Y,Z,[0 q_permTotal_YuJenne2017_wPRV],'--','ShowText','off');
 c2.LineWidth = lineWidth*2;
 c2.LineColor = refColor_YuJenne2017;
 c2.HandleVisibility='off';
-
-% dummy plots for legend
-p1 = plot(-99*[1, 0.5],-99*[1, 0.5],'-');
-p1.LineWidth = c1.LineWidth;
-p1.Color = c1.LineColor;
-p1.LineStyle = c1.LineStyle;
-
-p2 = plot(-99*[1 1],-99*[1 1],'--');
-p2.LineWidth = c2.LineWidth;
-p2.Color = c2.LineColor;
-p2.LineStyle = c2.LineStyle;
-
-s1 = scatter(S_ro_YuJenne2017,D_w_YuJenne2017,100,refColor_YuJenne2017,'^','LineWidth',lineWidth);
-
-% reference contour for PFF performance
+ % contour for PFF performance
 [~,c3] = contour(X,Y,Z,[0 q_permTotal_PFF],':','ShowText','off');
 c3.LineWidth = lineWidth*2;
 c3.LineColor = refColor_PFF;
 c3.HandleVisibility='off';
 
-% dummy plot for legend
+% reference markers
+ % marker for ref, Yu and Jenne
+s1 = scatter(S_ro_YuJenne2017,D_w_YuJenne2017,75,refColor_YuJenne2017,'x','LineWidth',lineWidth*1.5);
+s1.HandleVisibility='off';
+ % marker for PFF performance
+s2 = scatter(S_ro_PFF,D_w_PFF,50,refColor_PFF,'o','LineWidth',lineWidth*1.5);
+s2.HandleVisibility='off';
+
+% dummy plots for legend
+ % countour for architecture
+p1 = plot(-99*[1, 0.5],-99*[1, 0.5],'-');
+p1.LineWidth = c1.LineWidth;
+p1.Color = c1.LineColor;
+p1.LineStyle = c1.LineStyle;
+
+ % contour for ref, Yu and Jenne
+p2 = plot(-99*[1 1],-99*[1 1],'--');
+p2.LineWidth = c2.LineWidth;
+p2.Color = c2.LineColor;
+p2.LineStyle = c2.LineStyle;
+ % marker for ref, Yu and Jenne
+s1dummy = scatter(-99*[1, 0.5],-99*[1, 0.5]);
+s1dummy.Marker = s1.Marker;
+s1dummy.CData = s1.CData;
+s1dummy.SizeData = s1.SizeData;
+s1dummy.LineWidth = s1.LineWidth;
+
+ % contour for ref, PPF
 p3 = plot(-99*[1 1],-99*[1 1],'--');
 p3.LineWidth = c3.LineWidth;
 p3.Color = c3.LineColor;
 p3.LineStyle = c3.LineStyle;
-
-s2 = scatter(S_ro_PFF,D_w_PFF,100,refColor_PFF,'o','LineWidth',lineWidth);
+ % marker for ref, PFF
+s2dummy = scatter(-99*[1, 0.5],-99*[1, 0.5]);
+s2dummy.Marker = s2.Marker;
+s2dummy.CData = s2.CData;
+s2dummy.SizeData = s2.SizeData;
+s2dummy.LineWidth = s2.LineWidth;
 
 xlim([0 20])
 ylim([0 1])
 
 clabel(C,c1,'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
-xlabel('membrane Area (1000 m^2)',...
+xlabel('membrane area (1000 m^2)',...
     'FontSize',fontSize-1,'fontname','Times')
 ylabel('displacement (m^3/rad)',...
     'FontSize',fontSize-1,'fontname','Times')
@@ -228,9 +246,9 @@ end
 % "reference design producing " + num2str(q_permTotal_YuJenne2017_wPRV)+"m^3/day"];
 legLabels = [labelPTO(iPTO),...
 labelPTO(iPTO)+" at " + num2str(q_permTotal_YuJenne2017_wPRV) + " m^3/day", ...
-"ref. design Yu and Jenne 2017",...
+"ref. design A",...
 labelPTO(iPTO)+" at " + num2str(q_permTotal_PFF,4) + " m^3/day", ...
-"ref. design PFF"];
+"ref. design B"];
 leg = legend(legLabels);
 leg.Location = 'best';
 leg.FontSize = fontSize-1;
