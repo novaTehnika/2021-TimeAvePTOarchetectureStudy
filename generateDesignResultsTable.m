@@ -35,21 +35,21 @@
 %
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 iPTO = 1;
-D_wChoice = .3;
-S_roChoice = 3000;
+D_wChoice = .23;
+S_roChoice = 3700;
 
 studyType = 2; % selection for the type of study that was perfromed
                % 1 - 1D, pump displacement
                % 2 - 2D
 
-SSsetType = 1; % selection for set of sea states to display
+SSsetType = 7; % selection for set of sea states to display
                % 1-all in order by ID
                % 2-all in random order
                % 3-top 90% by yearly power in random order
                % 4-top 80% by yearly power in random order
                % 5-bottom 20% by yearly power in random order
                % 6-bottom 10% by yearly power in random order
-
+               % 7-random selection of 10 based on randomized order
 
 %% Specify sea states to include in the table
 switch SSsetType
@@ -65,6 +65,12 @@ switch SSsetType
         load("randSSset_bottom20.mat","SSset")
     case 6
         load("randSSset_bottom10.mat","SSset")
+    case 7
+        load("randSSset_all.mat","SSset")
+        nSS = 10;
+        [~,iSSsort] = sortrows( ...
+            [par.Hs(SSset(1:nSS))',par.Tp(SSset(1:nSS))']);
+        SSset = SSset(iSSsort);
 end
 
 %% find design values for a given combination specified by max disp. and RO module size
@@ -80,6 +86,8 @@ iS_roChoice = find(data(iPTO).S_ro(1,:) <= S_roChoice, 1,'last');
 end
 
 nSS = length(SSset);
+Hs = zeros(nSS,1);
+Tp = zeros(nSS,1);
 D_wDesign = zeros(nSS,1);
 S_roDesign = zeros(nSS,1);
 P_iDesign = zeros(nSS,1);
@@ -90,6 +98,8 @@ PP_genDesign = zeros(nSS,1);
 PP_cDesign = zeros(nSS,1);
 feasible = zeros(nSS,1);
 for iSS = 1:nSS
+    Hs(iSS) = par.Hs(SSset(iSS));
+    Tp(iSS) = par.Tp(SSset(iSS));
     q_perm_weighted(iSS) = data(iPTO).design(iD_wChoice,iS_roChoice,SSset(iSS)).q_perm;
     q_perm(iSS) = q_perm_weighted(iSS)/(par.weight(SSset(iSS))/100);
     D_wDesign(iSS) = data(iPTO).design(iD_wChoice,iS_roChoice,SSset(iSS)).D_w;
@@ -120,24 +130,28 @@ end
 
 switch PTOarray(iPTO)
     case {1 3}
-        varNames = {'Sea State','Displacement (m^3/rad)','S_ro(m^2)', ...
+        varNames = {'Sea State','Hs (m)','Tp (s)', ...
+            'Displacement (m^3/rad)','S_ro(m^2)', ...
             'P_i (MPa)', ...
             'Permeate Prod. (m^3/day)','Weighted Permeate Prod. (m^3/day)', ...
             'WEC Power Capture (kW)','Elec. Power Generation (kW)','Charge Pump Power Consumption (kW)', ...
             'Feasible (T/F)'};
-        T_D = table(SSset,D_wDesign,S_roDesign, ...
+        T_D = table(SSset,Hs,Tp, ...
+            D_wDesign,S_roDesign, ...
             1e-6*P_iDesign, ...
             24*3600*q_perm,24*3600*q_perm_weighted, ...
             1e-3*PP_wDesign,1e-3*PP_genDesign,1e-3*PP_cDesign, ...
             feasible, ...
             'VariableNames',varNames)
     case {2 4}
-        varNames = {'Sea State','Displacement (m^3/rad)','S_ro (m^2)', ...
+        varNames = {'Sea State','Hs (m)','Tp (s)', ...
+            'Displacement (m^3/rad)','S_ro (m^2)', ...
             'P_i (MPa)','duty', ...
             'Permeate Prod. (m^3/day)','Weighted Permeate Prod. (m^3/day)', ...
             'WEC Power Capture (kW)','Elec. Power Generation (kW)','Charge Pump Power Consumption (kW)', ...
             'Feasible (T/F)'};
-        T_D = table(SSset,D_wDesign,S_roDesign, ...
+        T_D = table(SSset,Hs,Tp, ...
+            D_wDesign,S_roDesign, ...
             1e-6*P_iDesign,dutyDesign, ...
             24*3600*q_perm,24*3600*q_perm_weighted, ...
             1e-3*PP_wDesign,1e-3*PP_genDesign,1e-3*PP_cDesign, ...
