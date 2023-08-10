@@ -34,9 +34,6 @@
 %   along with this program. If not, see <https://www.gnu.org/licenses/>.
 %
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-iPTO = 1;
-D_wChoice = .23;
-S_roChoice = 3700;
 
 studyType = 3; % selection for the type of study that was perfromed
                % 1 - 2D studies that index data variable with PTO type and
@@ -54,6 +51,15 @@ SSsetType = 7; % selection for set of sea states to display
                % 5-bottom 20% by yearly power in random order
                % 6-bottom 10% by yearly power in random order
                % 7-random selection of 10 based on randomized order
+switch studyType
+    case [1 2]
+        iPTO = 1;
+        D_wChoice = .23;
+        S_roChoice = 3700;
+    case 3
+        iiPTO = iPTO;
+        iPTO = 1;
+end
 
 %% Specify sea states to include in the table
 switch SSsetType
@@ -90,8 +96,8 @@ switch studyType
 
     case 3 % for studies that only consider one design and are just run to
            % find the optimal operating conditions
-        iD_wChoice = 1;
-        iS_roChoice = 1;
+        iD_wChoice = numel(D_wArray);
+        iS_roChoice = numel(S_roArray);
 end
 
 nSS = length(SSset);
@@ -125,7 +131,7 @@ for iSS = 1:nSS
     end
 end
 
-if PTOarray(iPTO) == 2 || PTOarray(iPTO) == 4
+if PTOarray(iiPTO(iPTO)) == 2 || PTOarray(iiPTO(iPTO)) == 4
     dutyDesign = zeros(nSS,1);
     for iSS = 1:nSS
         dutyDesign(iSS) = data(iPTO).design(iD_wChoice,iS_roChoice,SSset(iSS)).duty;
@@ -137,7 +143,7 @@ end
 
 %% make table
 
-switch PTOarray(iPTO)
+switch PTOarray(iiPTO(iPTO))
     case {1 3}
         varNames = {'Sea State','Hs (m)','Tp (s)', ...
             'Displacement (m^3/rad)','S_ro(m^2)', ...
