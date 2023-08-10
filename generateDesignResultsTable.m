@@ -38,9 +38,13 @@ iPTO = 1;
 D_wChoice = .23;
 S_roChoice = 3700;
 
-studyType = 2; % selection for the type of study that was perfromed
-               % 1 - 1D, pump displacement
-               % 2 - 2D
+studyType = 3; % selection for the type of study that was perfromed
+               % 1 - 2D studies that index data variable with PTO type and
+               %     membrane area
+               % 2 - 2D studies that index data variable with PTO type
+               % 3 - studies that only consider one design and are just run
+               %     to find the optimal operating conditions. In this case
+               %     'D_wChoice' and 'S_roChoice' don't affect anything
 
 SSsetType = 7; % selection for set of sea states to display
                % 1-all in order by ID
@@ -76,13 +80,18 @@ end
 %% find design values for a given combination specified by max disp. and RO module size
 switch studyType
     case 1 % for studies that index data variable with PTO type and membrane area
-iiS_ro = find(S_roArray <= S_roChoice, 1,'last');
-iD_wChoice = find(data(iPTO,iiS_ro).D_w(:,1) <= D_wChoice, 1,'last');
-iS_roChoice = 1;
+        iiS_ro = find(S_roArray <= S_roChoice, 1,'last');
+        iD_wChoice = find(data(iPTO,iiS_ro).D_w(:,1) <= D_wChoice, 1,'last');
+        iS_roChoice = 1;
 
     case 2 % for studies that index data variable with PTO type
-iD_wChoice = find(data(iPTO).D_w(:,1) <= D_wChoice, 1,'last');
-iS_roChoice = find(data(iPTO).S_ro(1,:) <= S_roChoice, 1,'last');
+        iD_wChoice = find(data(iPTO).D_w(:,1) <= D_wChoice, 1,'last');
+        iS_roChoice = find(data(iPTO).S_ro(1,:) <= S_roChoice, 1,'last');
+
+    case 3 % for studies that only consider one design and are just run to
+           % find the optimal operating conditions
+        iD_wChoice = 1;
+        iS_roChoice = 1;
 end
 
 nSS = length(SSset);
