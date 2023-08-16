@@ -161,12 +161,6 @@ ax1.FontName = 'times';
 ax1.FontSize = fontSize-1;
 hold on
 
-% PTO design data
-[C,c1] = contour(X,Y,Z,levels,'-','ShowText','on');
-c1.LineWidth = lineWidth;
-c1.LineColor = 'k';
-c1.HandleVisibility='off';
-
 % reference contours
  % contour for ref, Yu and Jenne
 [~,c2] = contour(X,Y,Z,[0 q_permTotal_YuJenne2017_wPRV],'--','ShowText','off');
@@ -179,6 +173,19 @@ c3.LineWidth = lineWidth*2;
 c3.LineColor = refColor_PFF;
 c3.HandleVisibility='off';
 
+% PTO design data
+[C,c1] = contour(X,Y,Z,levels,'-','ShowText','off');
+c1.LineWidth = lineWidth;
+c1.LineColor = 'k';
+c1.HandleVisibility='off';
+
+[C,c1b] = contour(X,Y,Z,levels,'-','ShowText','on');
+c1b.LineWidth = lineWidth;
+c1b.LineColor = 'k';
+c1b.LabelSpacing = 100;
+c1b.HandleVisibility='off';
+
+
 % reference markers
  % marker for ref, Yu and Jenne
 s1 = scatter(S_ro_YuJenne2017,D_w_YuJenne2017,75,refColor_YuJenne2017,'x','LineWidth',lineWidth*1.5);
@@ -186,6 +193,7 @@ s1.HandleVisibility='off';
  % marker for PFF performance
 s2 = scatter(S_ro_PFF,D_w_PFF,50,refColor_PFF,'o','LineWidth',lineWidth*1.5);
 s2.HandleVisibility='off';
+
 
 % dummy plots for legend
  % countour for architecture
@@ -221,25 +229,25 @@ s2dummy.LineWidth = s2.LineWidth;
 xlim([0 20])
 ylim([0 1])
 
-clabel(C,c1,'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
+clabel(C,c1b,'Interpreter','latex','FontSize',fontSize-1,'fontname','Times')
 xlabel('membrane area (1000 m^2)',...
     'FontSize',fontSize-1,'fontname','Times')
 ylabel('displacement (m^3/rad)',...
     'FontSize',fontSize-1,'fontname','Times')
 title("Permeate Production (m^3/day): "+labelPTO(iPTO),...
     'FontSize',fontSize,'fontname','Times')
-if iPTO == 3 || iPTO == 4 || iPTO == 5 || iPTO == 8 || iPTO == 9 || iPTO == 10
-    switch 1
-        case 1
-            title("Permeate Production (m^3/day): "+labelPTO(iPTO)+...
-                " with 30 MPa Limit",...
-                'FontSize',fontSize,'fontname','Times')
-        case 2
-            title("Permeate Production (m^3/day): "+labelPTO(iPTO)+...
-                " with 20 MPa Limit",...
-                'FontSize',fontSize,'fontname','Times')
-    end
-end
+% if iPTO == 3 || iPTO == 4 || iPTO == 5 || iPTO == 8 || iPTO == 9 || iPTO == 10
+%     switch 1
+%         case 1
+%             title("Permeate Production (m^3/day): "+labelPTO(iPTO)+...
+%                 " with 30 MPa Limit",...
+%                 'FontSize',fontSize,'fontname','Times')
+%         case 2
+%             title("Permeate Production (m^3/day): "+labelPTO(iPTO)+...
+%                 " with 20 MPa Limit",...
+%                 'FontSize',fontSize,'fontname','Times')
+%     end
+% end
 
 % legLabels = ["performance of "+labelPTO(iPTO),...
 % labelPTO(iPTO)+" designs producing " + num2str(q_permTotal_YuJenne2017_wPRV) + "m^3/day", ...
