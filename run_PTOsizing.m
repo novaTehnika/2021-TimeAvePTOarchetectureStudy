@@ -100,7 +100,7 @@ bounds.p_w_bnds = [4e6 30e6]; % [Pa/Pa] Bounds for pressure at WEC driven pump
 bounds.D_bnds = [0.1 1]; % [-] bounds for valve switching duty
 
 % WEC: load time averaged results for WEC performance
-switch 2
+switch 1
     case 1
         filename_WECpowerCurve = 'data_coulombPTO_dampingStudy_20220927_slim.mat';
         SSset = 1:114;
@@ -125,12 +125,12 @@ design_case = [1 2 1 2 1 3 4 3 4 3];
 % Specified design
 iPTO = 1;
  % WEC-driven pump displacement
-D_w = 0.3;
-f_D_w = 0.25;
-inc_D_w = (0.05)*D_w;
+D_w = 0.23;
+f_D_w = 0.01;
+inc_D_w = (0.01)*D_w;
  % Total Ro membrane area;
-S_ro = 3000;
-f_S_ro = 0;
+S_ro = 3700;
+f_S_ro = 0.01;
 inc_S_ro = 37;
  % ERU configuration
 ERUconfig = 1; % 0-w/o ERU; 1-w/ ERU
@@ -159,16 +159,5 @@ data = PTOsizing_multiSS(D_wArray,S_roArray, ...
                 ERUconfig,par);
 
 %% %%%%%%%%%%%%   SAVE DATA   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-filename = ['data_PTOsizing_',char(datetime("now",'Format','yyyyMMdd'))];
-files = ls;
-nfiles = size(files,1);
-k = 1;
-for j = 1:nfiles
-    if contains(files(j,:),filename)
-        k = k+1;
-        filenameTag = ['_',num2str(k)];
-    else
-        filenameTag = [];
-    end
-end
-save([filename,filenameTag],'-v7.3')
+filename = ['data_PTOsizing_',char(datetime("now",'Format','yyyyMMddHHmmss'))];
+save(filename,'-v7.3')
