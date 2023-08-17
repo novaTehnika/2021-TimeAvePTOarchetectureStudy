@@ -159,5 +159,5 @@ data = PTOsizing_multiSS(D_wArray,S_roArray, ...
                 ERUconfig,par);
 toc
 %% %%%%%%%%%%%%   SAVE DATA   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-filename = ['data_PTOsizing_PVV_',char(datetime("now",'Format','yyyyMMddHHmmss'))];
+filename = ['data_PTOsizing_SVV_',char(datetime("now",'Format','yyyyMMddHHmmss'))];
 save(filename,'-v7.3')
