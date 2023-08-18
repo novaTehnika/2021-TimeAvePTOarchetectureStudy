@@ -35,7 +35,7 @@
 %
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-studyType = 3; % selection for the type of study that was perfromed
+studyType = 4; % selection for the type of study that was perfromed
                % 1 - 2D studies that index data variable with PTO type and
                %     membrane area
                % 2 - 2D studies that index data variable with PTO type
@@ -43,7 +43,7 @@ studyType = 3; % selection for the type of study that was perfromed
                %     to find the optimal operating conditions. In this case
                %     'D_wChoice' and 'S_roChoice' don't affect anything
 
-SSsetType = 7; % selection for set of sea states to display
+SSsetType = 1; % selection for set of sea states to display
                % 1-all in order by ID
                % 2-all in random order
                % 3-top 90% by yearly power in random order
@@ -98,6 +98,12 @@ switch studyType
            % find the optimal operating conditions
         iD_wChoice = numel(D_wArray);
         iS_roChoice = numel(S_roArray);
+
+     case 4 % for studies that only consider one design and are just run to
+            % find the optimal operating conditions same as case 3 but with
+            % data trimmed to only include one design.
+        iD_wChoice = 1;
+        iS_roChoice = 1;
 end
 
 nSS = length(SSset);
