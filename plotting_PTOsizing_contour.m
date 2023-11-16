@@ -145,9 +145,9 @@ refColor_PFF = blue;
 labelPTO = ["P-FF","P-VF","S-FF","S-VF","M-FF", ...
             "P-FV","P-VV","S-FV","S-VV","M-FV"];
 
-X = 1e-3*[[0,data(iPTO).S_ro(1,:)];[zeros(nD_w,1), data(iPTO).S_ro]];
-Y = [zeros(1,nS_ro+1);[data(iPTO).D_w(:,1), data(iPTO).D_w]];
-Z = 24*3600*[zeros(1,nS_ro+1);[zeros(nS_ro,1), data(iPTO).q_permTotal]];
+X = 1e-3*[data(iPTO).S_ro];
+Y = [data(iPTO).D_w];
+Z = 24*3600*[data(iPTO).q_permTotal];
 
 levels = [500:500:4000];
 
