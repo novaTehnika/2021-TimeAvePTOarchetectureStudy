@@ -123,7 +123,7 @@ function data = PTOsizing_multiSS(D_wArray,S_roArray,bounds,iPTO, ...
     
     % Inital values
     p_f_o = (6e6)/pScale;
-    p_w_o = (12e6)/pScale;
+    p_w_o = (8e6)/pScale;
     duty_o = (0.9)/dutyScale;
     
     %% Build arguments for fmincon()
