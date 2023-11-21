@@ -73,8 +73,16 @@ function  varargout = model_timeAvePTO(x,par,iPTO,ERUconfig,outputConfig)
             PP_w = power(T_c);
             dp_w = T_c*par.eta_w/par.D_w;
             q_w = PP_w*par.eta_w/dp_w;
+
+            % first guess at p_f assuming p_f is less than upper limit
             q_perm = q_w/duty/(ERUconfig + (1-ERUconfig)/par.Y);
             p_f = q_perm/(par.S_ro*par.A_w) + par.p_osm;
+            
+            % ensure p_f is below limit and recalculate permeate production
+            p_f = (p_f > par.p_f_bnds(2))*par.p_f_bnds(2) ...
+                + (p_f <= par.p_f_bnds(2))*p_f;
+            q_perm = (par.S_ro*par.A_w)*(p_f-par.p_osm);
+
             PP_gen = par.eta_gen*(duty*par.eta_pm*(p_h-p_f) ...
                     - (1-duty)*(p_f-par.p_c)/par.eta_pm) ...
                     *q_perm*(ERUconfig + (1-ERUconfig)/par.Y);
