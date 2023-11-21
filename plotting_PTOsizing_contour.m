@@ -144,10 +144,16 @@ refColor_PFF = blue;
 % iPTO = iiPTO;
 labelPTO = ["P-FF","P-VF","S-FF","S-VF","M-FF", ...
             "P-FV","P-VV","S-FV","S-VV","M-FV"];
-
-X = 1e-3*[data(iPTO).S_ro];
-Y = [data(iPTO).D_w];
-Z = 24*3600*[data(iPTO).q_permTotal];
+switch 2
+    case 1
+        X = 1e-3*[data(iPTO).S_ro];
+        Y = [data(iPTO).D_w];
+        Z = 24*3600*[data(iPTO).q_permTotal];
+    case 2
+        X = 1e-3*[[0,data(iPTO).S_ro(1,:)];[zeros(nD_w,1), data(iPTO).S_ro]];
+        Y = [zeros(1,nS_ro+1);[data(iPTO).D_w(:,1), data(iPTO).D_w]];
+        Z = 24*3600*[zeros(1,nS_ro+1);[zeros(nS_ro,1), data(iPTO).q_permTotal]];
+end
 
 levels = [500:500:4000];
 
